@@ -1,6 +1,6 @@
 var RegMgrGrading	= {
 
-	options	: []
+	options	: [] // options
 };
 
 
