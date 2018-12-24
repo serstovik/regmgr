@@ -1,0 +1,24 @@
+#applicationEd .winRow:after{
+
+	content: '';
+	display: none;
+	clear: both;
+
+}
+#applicationEd .winContainer.right {
+
+	float			: right;
+	background		: red;
+
+}
+
+#applicationEd .winContainer.auto {
+
+	float			: none;
+	width			: auto;
+
+	background		: green;
+	clear:none;
+
+}
+
