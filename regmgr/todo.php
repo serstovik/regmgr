@@ -23,3 +23,5 @@ rmCfg
 
 	getEmails(); // ['status.new' => [0 => ..., 1 => ...], 'status.open' => [...] ]
 	getEmails('status.new'); // [0 => ['template' => ....], 1 => ...]
+
+Comment for Bloody
