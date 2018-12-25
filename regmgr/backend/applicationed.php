@@ -80,6 +80,8 @@ class mwApplicationEd extends mwEditor {
 	\**//** -------------------------------------------------------------------= by Mr.V!T @ Morad Media Inc. =----/** //**/
 	function save ($id = '') {
 
+	//	__($_POST);
+
 		return parent::save($id);
 
 	} //FUNC save
@@ -126,33 +128,32 @@ class mwApplicationEd extends mwEditor {
 
 		<div class="winHDivider"></div>
 
-		<div class="winRow flex" style="width: <?=mw3() ? 'auto' : $this->dialogWidth?>px">
-
-			<div id="<?=$this->EditorName?>_panel" class="winContainer right hidden" style="width:<?=$this->panelWidth?>%">
-
-				<?=$this->winTabsContents($tabs);?>
-
-			</div>
-
-			<div class="winVDivider right" style="display: <?=mw3()? 'none' : ''?>;"></div>
-
-			<div class="winContainer auto">
-
-
-				<form action="" method="post" id="<?=$this->EditorName?>_form" onsubmit="return <?=$this->EditorName?>.save();">
-
+		<form action="" method="post" id="<?=$this->EditorName?>_form" onsubmit="return <?=$this->EditorName?>.save();">
+	
+			<div class="winRow flex" style="width: <?=mw3() ? 'auto' : $this->dialogWidth?>px">
+	
+				<div id="<?=$this->EditorName?>_panel" class="winContainer right hidden" style="width:<?=$this->panelWidth?>%">
+	
+					<?=$this->winTabsContents($tabs);?>
+	
+				</div>
+	
+				<div class="winVDivider right" style="display: <?=mw3()? 'none' : ''?>;"></div>
+	
+				<div class="winContainer auto">
+	
 					<input type="hidden" name="id" value="" />
 					<input type="hidden" name="sn" value="" />
 					<input type="hidden" name="type" value="" />
 
 					<div class="winContent flex full" id="<?=$this->EditorName?>_formContents"></div>
-
-				</form>
-
+	
+				</div>
+	
 			</div>
 
-		</div>
-
+		</form>
+	
 		<div class="winFooter">
 			<a class="apply" rel="<?=$this->EditorName?>_form"><?=mw3()? '' : 'Save'?></a>
 			<a class="close winCloseClick"><?=mw3()? '' : 'Cancel'?></a>
@@ -177,8 +178,9 @@ class mwApplicationEd extends mwEditor {
 				$tabs[$name.'_'.$tName] = [
 
 					'name'		=> $tName,			// Tab short name
+					'widget'	=> $w,				// Extension widget
+					'method'	=> 'editor_'.$tName,		// Expected renderer method
 					'caption'	=> $cap,			// Tab visible caption
-					'method'	=> [$w, '_ob_editor_'.$tName],	// Prepared renderer
 					'selected'	=> $i == 0,			// Default tab marker
 
 				]; //$tabs
@@ -201,7 +203,7 @@ class mwApplicationEd extends mwEditor {
 			<tr>
 			<?php	foreach ( $tabs as $name => $row ) { ?>
 
-					<td rel="<?=$name?>" class="<?=$row['selected'] ? 'Selected' : ''?>" onclick="jQuery('#<?=$this->EditorName?>_panel').removeClass('hidden'); mwSwitchTab(this);"><?=$row['caption']?></td>
+					<td rel="<?=$name?>" onclick="jQuery('#<?=$this->EditorName?>_panel').removeClass('hidden'); mwSwitchTab(this);"><?=$row['caption']?></td>
 
 			<?php	} //FOR each widget ?>
 
@@ -215,11 +217,11 @@ class mwApplicationEd extends mwEditor {
 
 		foreach ( $tabs as $name => $row ) {
 		?>
-			<div id="<?=$name?>" class="winContainer flex" style="min-width: <?=$this->minPanelWidth?>px;<?=!$row['selected'] ? ' display: none;' : ''?>">
+			<div id="<?=$name?>" class="winContainer flex" style="min-width: <?=$this->minPanelWidth?>px;">
 
 				<div class="winContent flex full">
 
-					<?=call_user_func($row['method'])?>
+					<?=$this->getExtensionEditor($row['widget'], $row['method'])?>
 
 				</div>
 
@@ -230,6 +232,60 @@ class mwApplicationEd extends mwEditor {
 	} //FUNC winTabsContents
 
 /* ==== Helpers ============================================================================================================= */
+
+	function getExtensionEditor ($obj, $method) {
+		
+		// Validating method
+		if ( !method_exists($obj, $method) )
+			return 'Impropertly configured extension, invalid method: ['.$method.']';
+
+	// ---- HTML ----
+		
+		// Getting editor HTML
+		$html	= call_user_func([$obj, '_ob_'.$method]); 
+
+		// __($html);
+	
+	// ---- Inputs ----
+		
+		// Parsing editor inputs and converting them into array format
+		// All extension inputs sould be added into extensions subarray, indexed by extension name		
+		
+		// Using vTpl for inputs parsing
+		$tpl	= new vTpl2($html);
+		
+		foreach (['input', 'textarea', 'select'] as $tagName) 
+			
+			$tpl->parse()->section($tagName, function ($node) use ($obj) {
+				
+				// Skipping tech inputs
+				if ( empty($node->attr['name']) )
+					return;
+				
+				$name	= $node->attr['name'];
+
+				// For correct array inputs support - splitting into path chunks, and wrapping each individually
+				$name	= strToArray($name, '[]');
+			
+				// Imploding back, and wrapping as array input
+				$name	= '['.implode('][', $name).']';
+			
+				// Prefixing as extension input
+				$name	= 'extensions['.$obj->WidgetName.']'.$name;
+			
+				// Done
+				$node->attr['name'] = $name;
+				
+				return $node;
+					
+			}); //FUNC parse inputs
+
+		// Getting updated html
+		$html	= $tpl->html();			
+
+		return $html;
+
+	} //FUNC winTabsContents
 
 	function loadExtensions ( $force = false ) {
 

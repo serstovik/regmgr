@@ -74,12 +74,15 @@ class tplApplication extends vTpl2 {
 
 			// Parsing all tab contents and collecting headers/bodies as array
 			// After parse - rendering tabs using appropiate renderer
-			$tabs	= [];
+			$tabs		= [];
+			
+			// Marking selected tab
+			$selected	= false;
 					
 			// Using counter to autoname tabs names
 			$i	= 1;
 			
-			$node->parse()->section('tabContent', function ($node) use (&$tabs, &$i) {
+			$node->parse()->section('tabContent', function ($node) use (&$tabs, &$i, &$selected) {
 
 			// ---- Head ----
 				
@@ -117,7 +120,13 @@ class tplApplication extends vTpl2 {
 				$tabs[$name] = [
 					'name'		=> $name,
 					'caption'	=> $cap,
+					'selected'	=> false,
 				]; //$tabs
+			
+				// Checking if tab is marked for selection
+				
+				if ( !empty( $node->attr['selected'] ) )
+					$selected	= $name;
 			
 			// ---- Body ----
 			
@@ -129,6 +138,13 @@ class tplApplication extends vTpl2 {
 				
 			}); //FUNC parse tabContent
 			
+			// Selecting some tab
+			if ( !$selected )
+				$selected = reset($tabs)['name'];
+			
+			// Adding selected marker
+			$tabs[$selected]['selected'] = true;
+				
 			// Rendering tabs using selected renderer
 			// ToDo: implement more rendering methods for frontend and give designers ability to choose
 			if ( $this->backend )
@@ -164,15 +180,12 @@ class tplApplication extends vTpl2 {
 		// Reading initial height
 		// It will be updated with JS anyway, but looks better when it's locked initially
 		$height		= ( $node->attr['height'] ) ? $node->attr['height'] : 300;
-		
-		// Using counter to autoselect first tab
-		$i		= 0;
 	?>
 		<div class="rmTabs" id="<?=$jsSn?>" style="margin-bottom: <?=$height?>px;">
 
 		<?php	foreach ( $tabs as $name => $row ) { ?>
 		
-				<input type="radio" name="<?=$jsSn?>_tab" id="<?=$name?>" class="mw" <?=($i++ == 0) ? ' checked="checked"' : ''?> />
+				<input type="radio" name="<?=$jsSn?>_tab" id="<?=$name?>" class="mw" <?=($row['selected']) ? ' checked="checked"' : ''?> />
 				<label for="<?=$name?>" class="rmTabs-head"><?=$row['caption']?></label>
 				<div class="rmTabs-content" data-for="<?=$name?>"><?=$row['body']?></div>
 
@@ -252,10 +265,6 @@ class tplApplication extends vTpl2 {
 	*
 	\**//** ----------------------------------------------------------------= by SerStoVik @ Morad Media Inc. =----/** //**/
 	function renderTabs_backend ($node, $tabs) {
-
-		// Using counter to autoselect first tab
-		$i = 0;
-
 	?>
 		<dl class="mwDialog tools rmTabs-backend">
 
@@ -265,7 +274,7 @@ class tplApplication extends vTpl2 {
 
 					<?php	foreach ( $tabs as $name => $row ) { ?>
 
-							<td rel="<?=$name?>" onclick="mwSwitchTab(this);"<?=($i++ == 0) ? ' class="Selected"' : ''?>><?=$row['caption']?></td>
+							<td rel="<?=$name?>" onclick="mwSwitchTab(this);"<?=($row['selected']) ? ' class="Selected"' : ''?>><?=$row['caption']?></td>
 
 					<?php	} //FOR each tab ?>	
 
@@ -281,7 +290,7 @@ class tplApplication extends vTpl2 {
 
 		<?php	foreach ( $tabs as $name => $row ) { ?>
 		
-				<div class="winContainer" id="<?=$name?>"<?=($i++ == 0) ? '' : ' style="display:none"'?>><?=$row['body']?></div>
+				<div class="winContainer" id="<?=$name?>"<?=($row['selected']) ? '' : ' style="display:none"'?>><?=$row['body']?></div>
 		
 		<?php	} //FOR each tab ?>	
 
