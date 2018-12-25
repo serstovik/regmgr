@@ -1,6 +1,11 @@
 <?php
 define('RM_STATUS_NEW', 'new');
 define('RM_STATUS_OPEN', 'open');
+define('RM_STATUS_SUBMIT', 'submit');
+define('RM_STATUS_READY', 'ready');
+define('RM_STATUS_APPROVED', 'approved');
+define('RM_STATUS_DECLINED', 'declined');
+define('RM_STATUS_CLOSED', 'closed');
 
 /** //** ----= CLASS rmApplication	=------------------------------------------------------------------------------\**//** \
  *
@@ -106,6 +111,30 @@ class rmApplication extends vDBObject {
 
 	} //FUNC init
 
+
+	//overwrite default method
+	function toDB ($auto_new = TRUE, $fields = array()) {
+		__cap('overwrited toDB',$_POST, $this);
+
+		//check is submit button was clicked
+		if ( !empty($_POST['submit']) == '1' ) {
+
+			//change status to submit only for new or saved apps
+			if ( in_array($this->statusMajor, [RM_STATUS_NEW, RM_STATUS_OPEN]) ) {
+
+				$this->statusMajor = RM_STATUS_SUBMIT;
+
+				//trigger status submit event
+
+			}//change status to submit
+
+
+		}// submit button clicked
+
+		return parent::toDB($auto_new, $fields);
+
+	} //FUNC getList
+
 	function getList ($options = []) {
 
 		$sql	= "SELECT * FROM {$this->Table}";
@@ -128,6 +157,8 @@ class rmApplication extends vDBObject {
 	function loadByName1 ($name) {
 		return $this->loadByField('name', $name);
 	} //FUNC loadByName
+
+
 
 } //CLASS rmApplication
 
