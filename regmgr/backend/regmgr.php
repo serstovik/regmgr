@@ -21,13 +21,6 @@ class mwRegmgr extends mwController
 
 	function index () {
 
-/*/
-
-		if ( !empty($_GET['type']) and isAlnum($_GET['type']) )
-			$type = $_GET['type'];
-
-		$_GET['type'] = $type;
-/**/
 		$app		= new rmApplication();
 		
 		// Ensuring applications DB meets minimum requirements
@@ -35,35 +28,8 @@ class mwRegmgr extends mwController
 		
 		$rows		= $app->getList();
 
-	//	$this->addData('rmApps', $rows);
-
-	//	$headers	= $this->getHeaders();
-	//	$applications	= $this->getApplications();
-
-		$types		= rmCfg()->getTypes();
-
 		$tData		= [];
-/*/
-		// Loading form templates for all types available as subContents
-		// Using them to edit applications
-		foreach ( $types as $name => $params ) {
 
-			// Loading form template using tpl model
-			$template	= $params['template'];
-			$template	= compilePath($this->SectionName, $template);
-
-			$tpl		= $this->load->template($template, $tData, 'tplApplication');
-
-			// Initializing template parser
-			$tpl
-					->backend(true)
-					->main($tData);
-
-			// Adding template as subcontent
-			$this->load->addSubContent( 'appEd_'.$name, '<div>'.$tpl->html().'</div>' );
-
-		} //FOR each type
-/**/
 		$this->loadContent('applications', 'index', array('applications' => $rows, 'headers' => $headers));
 
 		if ( $this->isAjax )
