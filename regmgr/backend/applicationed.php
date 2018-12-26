@@ -106,29 +106,25 @@ class mwApplicationEd extends mwEditor {
 
 		<input data-settings="{ maximized:true }" />
 
-		<div class="winRow tools">
-
-			<div class="winContent right" style="width: calc(<?=$this->panelWidth?>% - 20px)">
-
-				<dl class="mwDialog tools">
-
-					<dd>
-						<?=$this->winTabsHeads($tabs)?>
-					</dd>
-
-				</dl>
-
-			</div>
-
-			<div class="winContent auto" id="<?=$this->EditorName?>_tabs">
-
-			</div>
-
-		</div>
-
-		<div class="winHDivider"></div>
-
 		<form action="" method="post" id="<?=$this->EditorName?>_form" onsubmit="return <?=$this->EditorName?>.save();">
+	
+			<div class="winRow tools">
+	
+				<div class="winContent right" style="width: calc(<?=$this->panelWidth?>% - 20px)">
+	
+					<dl class="mwDialog tools">
+	
+						<dd><?=$this->winTabsHeads($tabs)?></dd>
+	
+					</dl>
+	
+				</div>
+	
+				<div class="winContent auto" id="<?=$this->EditorName?>_tabs"></div>
+	
+			</div>
+	
+			<div class="winHDivider"></div>
 	
 			<div class="winRow flex" style="width: <?=mw3() ? 'auto' : $this->dialogWidth?>px">
 	
@@ -244,8 +240,6 @@ class mwApplicationEd extends mwEditor {
 		// Getting editor HTML
 		$html	= call_user_func([$obj, '_ob_'.$method]); 
 
-		// __($html);
-	
 	// ---- Inputs ----
 		
 		// Parsing editor inputs and converting them into array format
@@ -254,32 +248,12 @@ class mwApplicationEd extends mwEditor {
 		// Using vTpl for inputs parsing
 		$tpl	= new vTpl2($html);
 		
-		foreach (['input', 'textarea', 'select'] as $tagName) 
+		$tpl->parse()->inputs( function ($node) use ($obj) {
 			
-			$tpl->parse()->section($tagName, function ($node) use ($obj) {
-				
-				// Skipping tech inputs
-				if ( empty($node->attr['name']) )
-					return;
-				
-				$name	= $node->attr['name'];
-
-				// For correct array inputs support - splitting into path chunks, and wrapping each individually
-				$name	= strToArray($name, '[]');
+			return $node->render()->prefixInput('extensions['.$obj->WidgetName.']', true);
 			
-				// Imploding back, and wrapping as array input
-				$name	= '['.implode('][', $name).']';
-			
-				// Prefixing as extension input
-				$name	= 'extensions['.$obj->WidgetName.']'.$name;
-			
-				// Done
-				$node->attr['name'] = $name;
-				
-				return $node;
-					
-			}); //FUNC parse inputs
-
+		}); //FUNC render.inputs
+		
 		// Getting updated html
 		$html	= $tpl->html();			
 

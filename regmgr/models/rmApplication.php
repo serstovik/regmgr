@@ -114,7 +114,6 @@ class rmApplication extends vDBObject {
 
 	//overwrite default method
 	function toDB ($auto_new = TRUE, $fields = array()) {
-		__cap('overwrited toDB',$_POST, $this);
 
 		//check is submit button was clicked
 		if ( !empty($_POST['submit']) == '1' ) {
@@ -127,7 +126,6 @@ class rmApplication extends vDBObject {
 				//trigger status submit event
 
 			}//change status to submit
-
 
 		}// submit button clicked
 

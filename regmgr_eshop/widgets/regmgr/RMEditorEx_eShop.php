@@ -8,14 +8,13 @@ class mwRMEditorEx_eShop extends mwRMEditorEx
 {
 
 	public	$tabs	= [
-		'list'	=> 'List',
-		'forms'	=> 'Forms',
+		'products'	=> 'Products',
+		'forms'		=> 'Forms',
 	]; //$tabs
 
-	function editor_list () {
+	function editor_products () {
 
-		echo('Selected products list');
-
+		echo('Selected products list will be here');
 
 	} //FUNC editor
 

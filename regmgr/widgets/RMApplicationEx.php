@@ -4,10 +4,10 @@
  *	Some description here
  *
  *\**//** ---------------------------------------------------------------=	by SerStoVik @ Morad Media Inc. =------/** //**/
-class mwRMApplicationEx extends mwWidget
-{
+class mwRMApplicationEx extends mwWidget {
 
-	public	$backend = false;		// Backend editor rendering flag.
+	public	$tpl		= false;	// Callee template model
+	public	$application	= false;	// Current application
 
 	function render ($node) {
 	} //FUNC render

@@ -17,12 +17,22 @@ class mwApplication extends mwController {
 
 	} //FUNC init
 
-	function index ($type = '') {
+	function index ($type = '', $id = '') {
 
+	// ---- Vaidating ----
+	
 		$types = array_keys( rmCfg()->getTypes() );
 
 		if ( empty($type) or !in_arrayi($type, $types) )
 			throw( new Exception('Invalid type specified.') );
+
+		if ( !empty($id) and !isID($id) )
+			throw( new Exception('Invalid application specified.') );
+
+	// ---- Models and resources ----
+	
+		// Loading App model models
+		$this->load->model('rmApplication');
 
 		// Loading required resources
 	//	mwLoad('system')->resource('mw.system', 'mw.forms');
@@ -30,7 +40,25 @@ class mwApplication extends mwController {
 			->js('regMgr.js')
 			->css('regMgr.css');
 
-		$tData = [];
+	// ---- Application ----
+
+		// Creating and initializing application model
+		// Using clear application on template for extensions interractions
+		// Or loading it with existing application if ID provided
+		$app = new rmApplication($type);
+
+		if ( $id ) {
+			
+			$app->loadByID($id);
+			
+			if ( !$app->id )
+				throw( new Exception('Failed to laod specified application.') );
+			
+		} //IF existing application loading
+
+		$tData = ['application' => $app];
+
+	// ---- Template ----
 
 		// Compiling template name from config
 		$template = rmCfg()->getTypes($type, 'template');
@@ -38,17 +66,37 @@ class mwApplication extends mwController {
 
 		$tpl = $this->load->template($template, $tData, 'tplApplication');
 
-		$tpl->main($tData);
+		$tpl	
+			->application($app)
+			->main($tData);
+
+		$html	= $tpl->html();
+
+	// ---- Form ----
+
+		// Prefilling form from current app
+		// Doing only for existing applications, as input defaults are set on template anyway
+		if ( $app->id )
+		
+			$form	= new mwForm();
+			$form->init($html)->Inputs($app)->setup();
+		
+			$html	= $form->HTML();
+			
+		} //IF existing application
+	
+	// ---- Render ----
 
 		$sn = newSN('F');
 	?>
 		<form id="<?=$sn?>" action="" method="post" enctype="multipart/form-data" onsubmit="return false;">
-			<input type="hidden" name="submit" value="0" />
+			<input type="hidden" name="id" value="<?=$app->id?>" />
+			<input type="hidden" name="type" value="<?=$type?>" />
 			<input type="hidden" name="page" value="<?=$this->wgt->Page->ID?>" />
 			<input type="hidden" name="widget" value="<?=$this->wgt->ID?>" />
 			<input type="hidden" name="form" value="<?=$sn?>" />
-			<input type="hidden" name="type" value="<?=$type?>" />
-			<?=$tpl->html()?>
+			<input type="hidden" name="submit" value="0" />
+			<?=$html?>
 		</form>
 		
 		<script type="text/javascript">
@@ -61,16 +109,6 @@ class mwApplication extends mwController {
 
 		</script>
 	<?php
-
-	/*/
-		mwLoad('cart')->model();
-
-		// Replacing bollean with model
-		$cart =  mwCart()->init();
-
-		__($cart);
-	/**/
-
 	} //FUNC index
 
 	function save () {
@@ -97,7 +135,7 @@ class mwApplication extends mwController {
 		// Loading involved models
 		$this->load->model('rmApplication');
 
-		// Creating and initializing main model, passing section loader into it
+		// Creating and initializing main model
 		$app = new rmApplication($_POST['type']);
 
 	// ---- POST and FLES ----

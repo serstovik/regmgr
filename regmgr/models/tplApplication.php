@@ -17,6 +17,8 @@ class tplApplication extends vTpl2 {
 	public	$SectionName		= '';				// Section name.
 	public	$load			= false;			// Section loader.
 
+	public	$application		= false;			// Current application used for template loading
+
 	/** //** ----= main	=--------------------------------------------------------------------------------------\**//** \
 	*
 	* 	Main parser logic. Used as entry point for template parsing.
@@ -386,8 +388,29 @@ class tplApplication extends vTpl2 {
 			$wgt->backend = $this->backend;
 			$wgt->_fromArray($node->attr);
 
+			// Setting up widget
+			$wgt->tpl		= $this;
+			$wgt->application	= $this->application;
+
 			// Rendering whatever extension needs to render
-			return $wgt->_ob_render($node);
+			$html = $wgt->_ob_render($node);
+
+			// Renaming inputs to make sure they are stored in DB correctly
+			// All extension inputs sould be added into extensions subarray, indexed by extension name		
+			
+			// Using vTpl for inputs parsing
+			$tpl	= new vTpl2($html);
+			
+			$tpl->parse()->inputs( function ($node) use ($rel) {
+				
+				return $node->render()->prefixInput('extensions['.$rel.']', true);
+				
+			}); //FUNC render.inputs
+
+			$html = $tpl->html();
+
+			// Done
+			return $html;
 
 		}); //FUNC parese.extension
 
