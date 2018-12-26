@@ -17,7 +17,7 @@ class mwRMApplicationEx_eShopForms extends mwRMApplicationEx {
 	function __init () {
 
 		// Loading eshop loader
-		$this->esLoad	= mwLoad('eShop')->model('loader', 'esLoad');		
+		$this->esLoad	= mwLoad('eshop')->model('loader', 'esLoad');		
 
 	} //CONSTRUCTOR
 
@@ -73,7 +73,7 @@ class mwRMApplicationEx_eShopForms extends mwRMApplicationEx {
 	// ---- Templates ----
 
 		// Loading submit template and providing it with required data
-		$tpl = mwLoad('eShop')->model('tplSubmit', true);
+		$tpl = mwLoad('eshop')->model('tplSubmit', true);
 		
 		// Setting up tpl
 		$tpl

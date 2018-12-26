@@ -30,7 +30,7 @@ class mwRegmgr extends mwController
 
 		$tData		= [];
 
-		$this->loadContent('applications', 'index', array('applications' => $rows, 'headers' => $headers));
+		$this->loadContent('applications', 'index', array('applications' => $rows));
 
 		if ( $this->isAjax )
 			return;
@@ -39,17 +39,7 @@ class mwRegmgr extends mwController
 
 		return $this->loadIndex('desktop');
 
-	}//index()
-
-	function deleteApplication ($appId){
-
-		$app = (new rmApplication())
-			->id($appId)
-			->delete();
-
-		return $this->index();
-
-	} //FUNC deleteApplication
+	} //FUNC index
 
 /* ==== Helpers ============================================================================================================= */
 
