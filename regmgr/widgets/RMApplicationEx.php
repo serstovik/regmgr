@@ -1,13 +1,22 @@
 <?php
-/**//** ----= CLASS mwRMApplicationEx		=----------------------------------------------------------------------\**//** \
- *
- *	Some description here
- *
- *\**//** ---------------------------------------------------------------=	by SerStoVik @ Morad Media Inc. =------/** //**/
+/** //** ----= CLASS mwRMApplicationEx		 =---------------------------------------------------------------------\**//** \
+*
+*	Base model for application form extensions.
+*
+* 	@package	Morweb
+* 	@subpackage	regmgr
+* 	@category	widget
+*
+\**//** ------------------------------------------------------------------------= by SerStoVik @ Morad Media Inc. =----/** //**/
+
 class mwRMApplicationEx extends mwWidget {
 
-	public	$tpl		= false;	// Callee template model
-	public	$application	= false;	// Current application
+	public	$extName	= '';		// Extension name. If omited - widget name will be used.
+
+	public	$application	= false;	// Current application.
+	public	$data		= [];		// Extension data.
+
+	public	$tpl		= false;	// Callee template model.
 
 	function render ($node) {
 	} //FUNC render

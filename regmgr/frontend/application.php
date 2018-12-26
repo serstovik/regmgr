@@ -76,7 +76,7 @@ class mwApplication extends mwController {
 
 		// Prefilling form from current app
 		// Doing only for existing applications, as input defaults are set on template anyway
-		if ( $app->id )
+		if ( $app->id ) {
 		
 			$form	= new mwForm();
 			$form->init($html)->Inputs($app)->setup();

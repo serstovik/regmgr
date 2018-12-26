@@ -4,18 +4,46 @@
  *
  *
  *\**//** ----------------------------------------------------------------= by SerStoVik @ Morad Media Inc.	=------/** //**/
-class mwRMEditorEx_eShop extends mwRMEditorEx
-{
+class mwRMEditorEx_eShop extends mwRMEditorEx {
 
 	public	$tabs	= [
 		'products'	=> 'Products',
-		'forms'		=> 'Forms',
+	//	'forms'		=> 'Forms',
 	]; //$tabs
 
 	function editor_products () {
 
-		echo('Selected products list will be here');
+	// ---- Cart ----
+		
+		// Nothing to do if no cart stored
+		if ( empty($this->data['cart']) )
+			return;
 
+		// Getting cart data
+		$cData	= json_decode($this->data['cart'], true);
+
+		// Loading cart model and creating object
+		mwLoad('cart')->model();
+		$cart	= (new mwCart())->setItems( $cData );
+		
+	// ---- HTML ----
+	?>
+		<table class="<?=mw3()? 'contactsIndex' : 'IndexTable'?>">
+			<thead><tr>
+				<td class="Title">Title</td>				
+				<td class="Div"></td>
+				<td class="Num">Price</td>				
+			</tr></thead>
+			
+		<?php	foreach ( $cart->items as $id => $row ) { ?>	
+				<tbody >
+					<td class="Title"><?=$row['title']?></td>				
+					<td class="Div"></td>
+					<td class="Num"><?=$row['price']?></td>				
+				</tbody>
+		<?php	} //FOR each cart item ?>
+		</table>
+	<?php
 	} //FUNC editor
 
 	function editor_forms () {

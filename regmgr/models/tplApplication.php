@@ -388,9 +388,14 @@ class tplApplication extends vTpl2 {
 			$wgt->backend = $this->backend;
 			$wgt->_fromArray($node->attr);
 
+			// Defining extension name
+			if ( !$wgt->extName )
+				$wgt->extName = $rel;
+
 			// Setting up widget
 			$wgt->tpl		= $this;
 			$wgt->application	= $this->application;
+			$wgt->data		= ( !empty($this->application->extensions[$wgt->extName]) ) ? $this->application->extensions[$wgt->extName] : [];
 
 			// Rendering whatever extension needs to render
 			$html = $wgt->_ob_render($node);
@@ -401,9 +406,9 @@ class tplApplication extends vTpl2 {
 			// Using vTpl for inputs parsing
 			$tpl	= new vTpl2($html);
 			
-			$tpl->parse()->inputs( function ($node) use ($rel) {
+			$tpl->parse()->inputs( function ($node) use ($rel, $wgt) {
 				
-				return $node->render()->prefixInput('extensions['.$rel.']', true);
+				return $node->render()->prefixInput('extensions['.$wgt->extName.']', true);
 				
 			}); //FUNC render.inputs
 

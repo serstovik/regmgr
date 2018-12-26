@@ -17,6 +17,9 @@ class mwApplicationEd extends mwEditor {
 	public	$ItemKind		= 'Application';
 	public	$DataName		= 'rmApps';
 
+	public	$useDataCache		= false;	
+	public	$useWidnowCache		= false;	
+
 	public	$Privileges		= array('manage_applications');
 
 	public	$type			= '';
@@ -56,6 +59,10 @@ class mwApplicationEd extends mwEditor {
 	} //CONSTRUCTOR
 
 	function getDBObject () {
+
+		// Checking if already loaded
+		if ( $this->Item )
+			return $this->Item;
 
 		// ToDo: Implement static cache to allow multiple calls in a row
 		// Consider using clones and partial init for safety
@@ -97,10 +104,25 @@ class mwApplicationEd extends mwEditor {
 	\**//** -------------------------------------------------------------------= by Mr.V!T @ Morad Media Inc. =----/** //**/
 	function window ( $vars = array() ) {
 
-		$this->loadJS();
-		
+		// Listing extension tabs for later rendering
 		$tabs = $this->listTabs();
+		
+		// Loading template for current type
+		// Rendering with extensions
+		// Using this way because window cache is disabled, and editor is rendered for each item individually
+		// Compiling template name from config
+		$template = rmCfg()->getTypes($this->type, 'template');
+		$template = compilePath($this->SectionName, $template);
 
+		$tpl = $this->load->template($template, [], 'tplApplication');
+
+		$tpl	
+			->backend(true)
+			->application($this->Item)
+			->main([]);
+
+		$html	= $tpl->html();
+		
 	?>
 		<div class="winHeader">Edit Application:</div>
 
@@ -142,7 +164,7 @@ class mwApplicationEd extends mwEditor {
 					<input type="hidden" name="sn" value="" />
 					<input type="hidden" name="type" value="" />
 
-					<div class="winContent flex full" id="<?=$this->EditorName?>_formContents"></div>
+					<div class="winContent flex full" id="<?=$this->EditorName?>_formContents"><?=$html?></div>
 	
 				</div>
 	
@@ -236,6 +258,14 @@ class mwApplicationEd extends mwEditor {
 			return 'Impropertly configured extension, invalid method: ['.$method.']';
 
 	// ---- HTML ----
+	
+		// Defining extension name
+		if ( !$obj->extName )
+			$obj->extName = $obj->WidgetName;
+		
+		// Setting up extension
+		$obj->application	= $this->Item;
+		$obj->data		= ( !empty($this->Item->extensions[$obj->extName]) ) ? $this->Item->extensions[$obj->extName] : [];
 		
 		// Getting editor HTML
 		$html	= call_user_func([$obj, '_ob_'.$method]); 
@@ -250,7 +280,7 @@ class mwApplicationEd extends mwEditor {
 		
 		$tpl->parse()->inputs( function ($node) use ($obj) {
 			
-			return $node->render()->prefixInput('extensions['.$obj->WidgetName.']', true);
+			return $node->render()->prefixInput('extensions['.$obj->extName.']', true);
 			
 		}); //FUNC render.inputs
 		

@@ -6,6 +6,8 @@
  *\**//** ----------------------------------------------------------------= by SerStoVik @ Morad Media Inc.	=------/** //**/
 class mwRMApplicationEx_eShopForms extends mwRMApplicationEx {
 
+	public	$extName	= 'eShop';				// Extension name. If omited - widget name will be used.
+
 	public	$esLoad		= false;				// eShop loader
 
 	public	$gModel		= false;				// |- Group and item models.
@@ -26,9 +28,7 @@ class mwRMApplicationEx_eShopForms extends mwRMApplicationEx {
 		// ToDo: add support for non-cart eShop modes
 		mwLoad('cart')->model();
 		
-		$ext	= @$this->application->extensions[$this->WidgetName];
-		if ( !$ext )
-			$ext = [];
+		$ext	= $this->data;
 		
 		// Using new cart for new application, or initiating cart from application
 		if ( empty($this->application->id) ) {
@@ -96,11 +96,15 @@ class mwRMApplicationEx_eShopForms extends mwRMApplicationEx {
 			
 			for ( $j = 1; $j <= $item['quantity']; $j++, $i++ ) { 
 				
+				// Preparing input values data
+				// No need to fill values for backend editor
+				$iData	= $this->tpl->backend ? [] : @$ext['items'][$i];
+				
 				// Using default form, no subcontact prefill
-				$html .= $tpl->getContactForm('', @$ext['items'][$i], $i, ['item' => $item, 'group' => $group]);
+				$html	.= $tpl->getContactForm('', $iData, $i, ['item' => $item, 'group' => $group]);
 			
 			} //FOR each single item 
-		} //FOR each item in cart  
+		} //FOR each item in cart 
 
 		// Done, outputting collected html
 		echo($html);

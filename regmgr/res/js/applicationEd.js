@@ -40,24 +40,16 @@ var applicationEd = (function () {
 
 	}, //FUNC init
 
-	/** //** ----= dialog	=--------------------------------------------------------------------------------------\**//** \
+	/** //** ----= resetDialog	=------------------------------------------------------------------------------\**//** \
 	*
-	*	Initiates dialog before display.
+	*	Resets dialog changes and internal values.
 	*
 	*	@return SELF
 	*
 	\**//** -------------------------------------------------------------------= by Mr.V!T @ Morad Media Inc. =----/** //**/
-	dialog	: function ($id) {
+	resetDialog	: function () {
 
 		var $this	= this;
-
-	// ---- Subcontents ----
-
-		// Getting item type and loading corresponding form subContent
-		var $sName	= 'appEd_'+$this.type;
-
-		// Setting up form html from subcontent
-		var $html	= mwSubContent($this.dom.formContents).setup($sName);
 
 	// ---- Tabs ----
 
@@ -69,6 +61,21 @@ var applicationEd = (function () {
 
 		// Cleaning ghost mwDialog
 		$tabs.find('.mwDialog').removeClass('mwDialog');
+
+		return this; 
+
+	}, //FUNC resetDialog
+
+	/** //** ----= dialog	=--------------------------------------------------------------------------------------\**//** \
+	*
+	*	Initiates dialog before display.
+	*
+	*	@return SELF
+	*
+	\**//** -------------------------------------------------------------------= by Mr.V!T @ Morad Media Inc. =----/** //**/
+	dialog	: function ($id) {
+
+		var $this	= this;
 
 	// ---- Dialog ----
 

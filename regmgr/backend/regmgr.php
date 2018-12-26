@@ -43,7 +43,7 @@ class mwRegmgr extends mwController
 		$types		= rmCfg()->getTypes();
 
 		$tData		= [];
-
+/*/
 		// Loading form templates for all types available as subContents
 		// Using them to edit applications
 		foreach ( $types as $name => $params ) {
@@ -63,13 +63,13 @@ class mwRegmgr extends mwController
 			$this->load->addSubContent( 'appEd_'.$name, '<div>'.$tpl->html().'</div>' );
 
 		} //FOR each type
-
+/**/
 		$this->loadContent('applications', 'index', array('applications' => $rows, 'headers' => $headers));
 
 		if ( $this->isAjax )
 			return;
 
-		$this->load->editor('applicationEd');
+		$this->load->editor('applicationEd')->loadJS();
 
 		return $this->loadIndex('desktop');
 
