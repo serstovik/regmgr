@@ -71,12 +71,15 @@ class mwApplication extends mwController {
 			->main($tData);
 
 		$html	= $tpl->html();
-
+		
+		//__($tpl->message('thank_you'));
+		$thank_you = addslashes('<div style="width: 100%; text-align: center; font-size: 24px; ">Application saved. Thank you.</\' + \'div>');
+		
 	// ---- Form ----
 
 		// Prefilling form from current app
 		// Doing only for existing applications, as input defaults are set on template anyway
-		if ( $app->id )
+		if ( $app->id ) {
 		
 			$form	= new mwForm();
 			$form->init($html)->Inputs($app)->setup();
@@ -103,8 +106,12 @@ class mwApplication extends mwController {
 
 			jQuery( function () {
 				
-				rmApplication('#<?=$this->wgt->jsId?>');
-
+				rmApplication_inst = rmApplication({
+					sn		: '<?=$sn?>',
+					el		: '#<?=$this->wgt->jsId?>',
+					thank_you	: '<?=$thank_you?>',
+				});
+				
 			}); //jQuery.onLoad
 
 		</script>
@@ -148,10 +155,36 @@ class mwApplication extends mwController {
 
 		// Making sure table is up to date
 		$app->createTable()->updateTable();
+		
+		//check is submit button was clicked
+		if ( !empty($_POST['submit']) && $_POST['submit'] == '1' ) {
 
+			//change status to submit only for new or saved apps
+			if ( in_array($this->statusMajor, [RM_STATUS_NEW, RM_STATUS_OPEN]) ) {
+			
+				$app->setStatus(RM_STATUS_SUBMIT);
+			
+			}//change status to submit
+
+		}// submit button clicked
+		//submit != 1 - save and return clicked
+		else {
+			
+			
+			
+		}
+		//__($_POST, $app);
+		//$app->loadById();
+		
+		
+		//trigger before save
+		
 		// And saving data into DB
 		$app->fromArray($_POST)->toDB();
-
+		
+		//triger after save
+		
+		
 	} //FUNC save
 
 /* ==== Helpers ============================================================================================================= */

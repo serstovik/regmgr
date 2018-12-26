@@ -73,7 +73,7 @@ class mwApplicationEd extends mwEditor {
 	
 	/** //** ----= save	=--------------------------------------------------------------------------------------\**//** \
 	*
-	*	Custom save opeation.
+	*	Custom save operation.
 	* 
 	* 	@param	int	[$id] 	- Item ID to save.
 	*
@@ -141,6 +141,8 @@ class mwApplicationEd extends mwEditor {
 					<input type="hidden" name="id" value="" />
 					<input type="hidden" name="sn" value="" />
 					<input type="hidden" name="type" value="" />
+					<input type="hidden" name="statusmajor" value="" />
+					<input type="hidden" name="statusminor" value="" />
 
 					<div class="winContent flex full" id="<?=$this->EditorName?>_formContents"></div>
 	

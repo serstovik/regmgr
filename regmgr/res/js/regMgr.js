@@ -9,7 +9,7 @@ var RM_FRONTEND_AJAX = '/ajax/regmgr/application';
  * 	@category	model
  *
  \**//** -----------------------------------------------------------------------= by SerStoVik @ Morad Media Inc. =----/** //**/
-var rmApplication	= function ($el) {
+var rmApplication	= function ($options) {
 
 	return vEventObject(['onInit', 'onLoad', 'onSave'], {
 
@@ -20,7 +20,7 @@ var rmApplication	= function ($el) {
 
 		actions		: false,		// Action inputs
 
-		loader		: false,		// Form loader
+		loader		: false,	// Form loader
 		status		: false,		// Form status
 
 		tabs		: {			// Tabs elements
@@ -84,17 +84,21 @@ var rmApplication	= function ($el) {
 
 		var $this = this;
 		
+		$this.sn = $options['sn'];
+		
 	// ---- DOM ----
 
-		$el = _jq($el);
-
+		$el = _jq($options['el']);
+		
 		$this.dom.container	= $el;
 		$this.dom.form		= $this.dom.container.find('form');
 
 		$this.dom.actions	= $this.dom.form.find('.rmForm-action');
 		$this.dom.loader	= $this.dom.form.find('.rmForm-loader');
 		$this.dom.status	= $this.dom.form.find('.rmForm-status');
-
+		
+		$this.thank_you		= $options.thank_you || 'Thank you';
+		
 	// ---- Events ----
 
 		$this.dom.actions.filter('.save')
@@ -114,7 +118,9 @@ var rmApplication	= function ($el) {
 		styleDialog($this.dom.form);
 
 		$this.onInit($this);
-
+		
+		return $this;
+		
 	}, //FUNC init
 
 /* ==== Submit ============================================================================================================== */
@@ -131,21 +137,69 @@ var rmApplication	= function ($el) {
 
 			.start( function ($data) {
 			//	$this.state($action, true);
+			
+				//run loader
+				$this.dom.loader.show();
+			
 			}) //FUNC start
 
 			.stop( function ($data) {
 			//	$this.state($action, false);
+				
+				//simulation for localhost
+				setTimeout(function() {
+				
+				//disable loader
+				$this.dom.loader.hide();
+				
+				}, 1000);
+			
 			}) //FUNC srop
 
 			.success( function ($data) {
+				
+				//show thanks message
+				$this.dom.form.html($this.thank_you);
+				
 			}) //FUNC success
 
 			.error( function ($data) {
-				//__($data);
+			
+				//show validation error
+				//___($data._validations, $this.sn, $data._validations[$this.sn])
+				
+				// Error causes idling
+				//$this.state($el, false);
+
+				// Setting status if error returned
+				$this.dom.status.html( mwError($data.status.text) );
+			/*/	
+				if ( $data.res )
+					$status.append($data.res);
+			/**/	
+				// Each validation message should be captured
+				if ( $data._validations && $data._validations[$this.sn] ) {
+					
+					// Manually processing messages yet.
+					// ToDo: Implement erorrs handling API for frontend
+			
+					// Looping through each failed field and each message for that field
+					// All validatinos are indexed by form ID				
+					for ( var $field in $data._validations[$this.sn] ) {
+						for ( var $msg in $data._validations[$this.sn][$field] ) {
+							
+							// Appending each message to status area
+							$this.dom.status.append( mwError($data._validations[$this.sn][$field][$msg]) );
+			
+						} //FOR each message for field
+					} //FOR each fail field
+			
+				} //IF validations come
+				
 			}) //FUNC error
 
 			.go();
 
 	}, //FUNC save
-
+	
 }).init(); } //CLASS rmApplication
