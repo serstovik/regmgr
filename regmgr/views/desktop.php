@@ -17,5 +17,5 @@
 
 </div>
 <div class="mwDesktop">
-	<?=$applications;?>
+	<?=$table;?>
 </div>

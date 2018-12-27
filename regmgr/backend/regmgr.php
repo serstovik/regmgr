@@ -29,9 +29,51 @@ class mwRegmgr extends mwController
 		$rows		= $app->getList();
 
 		$tData		= [];
-
-		$this->loadContent('applications', 'index', array('applications' => $rows));
-
+		
+		$columns_cfg = rmCfg()->getBranch('backend', 'index');
+		
+		$table_heads = [];
+		foreach( $columns_cfg as $c_k => $c_v ) {
+			
+			//create table header
+			$table_heads[] = [
+				'label' => $c_v['label']
+			];
+			
+			//init column widget
+			//$column_widget = ...
+			
+			//trying to load special widget for column
+			$column_widget = $this->load->widget('RMDesktopEx', $c_k);
+			__($column_widget);
+			if ( !$column_widget )
+				$column_widget = $this->load->widget('RMDesktopEx', 'base');
+			
+			__($column_widget);
+			
+			//prepare column data
+			foreach($rows as $r_k => $r_v) {
+				
+				//init columns array
+				if ( !isset($rows[$r_k]) )
+					$rows[$r_k]['RMColumns'] = [];
+				
+				
+				//generate column html
+				$rows[$r_k]['RMColumns'][] = $column_widget->render($c_k, $c_v['value'], $r_v);
+				
+			}
+			
+		}
+		
+		$desk_list = $this->load->widgets('RMDesktopEx');
+		__($desk_list, $columns_cfg, $rows);
+		
+		$this->loadContent('table', 'index', array(
+			'heads' => $table_heads,
+			'rows' => $rows
+		));
+		
 		if ( $this->isAjax )
 			return;
 
