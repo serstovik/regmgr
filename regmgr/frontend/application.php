@@ -14,6 +14,7 @@ class mwApplication extends mwController {
 	function __init	() {
 
 		$this->load->model('rmCfg');
+		mwLoad('regmgr_attach')->model('rmAttach');
 
 	} //FUNC init
 
@@ -98,6 +99,7 @@ class mwApplication extends mwController {
 			<input type="hidden" name="page" value="<?=$this->wgt->Page->ID?>" />
 			<input type="hidden" name="widget" value="<?=$this->wgt->ID?>" />
 			<input type="hidden" name="form" value="<?=$sn?>" />
+			<input type="hidden" name="files" value="" />
 			<input type="hidden" name="submit" value="0" />
 			<?=$html?>
 		</form>
@@ -151,6 +153,13 @@ class mwApplication extends mwController {
 		if ( $v = $app->validate($_POST) )
 			throw( new mwValidationEx('Wrong info provided.', $v, $_POST['form']) );
 
+		//todo: add files logic
+		$Attacher	= new rmAttach();
+		if (isset($app->sn))
+			$_POST['sn']	= $app->sn;
+
+		$Attacher->uploadAndSaveDocument();
+
 	// ---- DB ----
 
 		// Making sure table is up to date
@@ -178,7 +187,7 @@ class mwApplication extends mwController {
 		
 		
 		//trigger before save
-		
+
 		// And saving data into DB
 		$app->fromArray($_POST)->toDB();
 		

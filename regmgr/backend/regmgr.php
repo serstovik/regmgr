@@ -45,11 +45,9 @@ class mwRegmgr extends mwController
 			
 			//trying to load special widget for column
 			$column_widget = $this->load->widget('RMDesktopEx', $c_k);
-			__($column_widget);
+
 			if ( !$column_widget )
 				$column_widget = $this->load->widget('RMDesktopEx', 'base');
-			
-			__($column_widget);
 			
 			//prepare column data
 			foreach($rows as $r_k => $r_v) {
@@ -57,7 +55,6 @@ class mwRegmgr extends mwController
 				//init columns array
 				if ( !isset($rows[$r_k]) )
 					$rows[$r_k]['RMColumns'] = [];
-				
 				
 				//generate column html
 				$rows[$r_k]['RMColumns'][] = $column_widget->render($c_k, $c_v['value'], $r_v);
@@ -67,8 +64,7 @@ class mwRegmgr extends mwController
 		}
 		
 		$desk_list = $this->load->widgets('RMDesktopEx');
-		__($desk_list, $columns_cfg, $rows);
-		
+
 		$this->loadContent('table', 'index', array(
 			'heads' => $table_heads,
 			'rows' => $rows
@@ -76,7 +72,7 @@ class mwRegmgr extends mwController
 		
 		if ( $this->isAjax )
 			return;
-
+		
 		$this->load->editor('applicationEd')->loadJS();
 
 		return $this->loadIndex('desktop');

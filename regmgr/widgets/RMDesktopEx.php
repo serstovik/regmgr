@@ -17,7 +17,6 @@ class mwRMDesktopEx extends mwWidget
 	\**//** ---------------------------------------------------------------------= by Alex @ Morad Media Inc. =----/** //**/
 	public function render($alias, $template, $row_data) {
 		
-		__($alias, $template);
 		if ( $alias == 'delete' && empty($template) )
 			$html = '<td><a class="Button Delete"></a></td>';
 		else {
