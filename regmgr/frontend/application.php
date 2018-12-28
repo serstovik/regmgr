@@ -183,7 +183,7 @@ class mwApplication extends mwController {
 		$app->fromArray($_POST)->toDB();
 		
 		//triger after save
-		
+	//	$this->addAjax('resultMessage', $msg);
 		
 	} //FUNC save
 

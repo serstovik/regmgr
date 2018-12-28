@@ -88,7 +88,18 @@ var applicationEd = (function () {
 		return $this;
 
 	}, //FUNC dialog
-
+	
+	del		: function ($id, $text) {
+		
+		var $this	= this;
+		
+		$text = jQuery('.regmgr-del-' + $id).attr('rel');
+		
+		// Calling parent
+		$parent.del.call($this, $id, $text);
+		
+	}, //FUNC del
+	
 	}); //CLASS
-
+	
 })(); //OBJECT applicationEd
