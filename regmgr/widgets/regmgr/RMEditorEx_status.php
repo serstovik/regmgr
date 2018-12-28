@@ -1,9 +1,9 @@
 <?php
 /**//** ----= CLASS mwRMEditorEx_status	=------------------------------------------------------------------------------\**//** \
- *
- *
- *
- *\**//** ----------------------------------------------------------------= by SerStoVik @ Morad Media Inc.	=------/** //**/
+*
+*
+*
+\**//** -----------------------------------------------------------------------------= by Alex @ Morad Media Inc. =----/** //**/
 class mwRMEditorEx_status extends mwRMEditorEx
 {
 
@@ -12,6 +12,9 @@ class mwRMEditorEx_status extends mwRMEditorEx
 	]; //$tabs
 
 	function editor_approval () {
+		
+		//__($this->application->statusList);
+		//__($this->data);
 		
 		//$this->load->model('rmCfg'); // how to load lib?
 		
@@ -32,7 +35,7 @@ class mwRMEditorEx_status extends mwRMEditorEx
 				
 				<tr><th>Custom Statuses:</th></tr>
 				<tr><td>
-					<select id="regmgr_minor_status" onChange="jQuery('[name=statusminor]').val(jQuery(this).val());">
+					<select name="status_minor" id="regmgr_minor_status" onChange="jQuery('[name=status_minor]').val(jQuery(this).val());">
 					<?foreach($statuses as $k => $v):?>
 						<option value="<?=$k?>"><?=$v?></option>
 					<?endforeach;?>
@@ -67,9 +70,6 @@ class mwRMEditorEx_status extends mwRMEditorEx
 				
 				//update major status text
 				update_text();
-				
-				//update minor status select
-				jQuery('#regmgr_minor_status').val(jQuery('[name=statusminor]')).change();
 				
 			});
 			

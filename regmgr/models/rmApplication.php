@@ -18,7 +18,7 @@ define('RM_STATUS_CLOSED', 'closed');
 \**//** ------------------------------------------------------------------------= by SerStoVik @ Morad Media Inc. =----/** //**/
 class rmApplication extends vDBObject {
 
-//	static public $statusNew	= 'new';
+	public $statusList		= [RM_STATUS_NEW, RM_STATUS_OPEN, RM_STATUS_SUBMIT, RM_STATUS_READY, RM_STATUS_APPROVED, RM_STATUS_DECLINED, RM_STATUS_CLOSED];
 
 // ---- SETTINGS ----
 
@@ -55,8 +55,8 @@ class rmApplication extends vDBObject {
 			->setField('modified')->Validations('')->DB(true, VDBO_DB_READ)->dbType('timestamp', false, true, true)
 			->setField('created')->Validations('')->DB(true, VDBO_DB_READ)->dbType('timestamp', false, 'CURRENT_TIMESTAMP', false)
 
-			->setField('statusMajor')->Validations('isAlnum')
-			->setField('statusMinor')->Validations('isAlnum')
+			->setField('statusMajor', 'status_major')->Validations('isAlnum')
+			->setField('statusMinor', 'status_minor')->Validations('isAlnum')
 
 			->setField('extensions')->Validations('')->SZ()->dbType('text', false)
 

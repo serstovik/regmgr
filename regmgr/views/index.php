@@ -2,7 +2,7 @@
 	<thead><tr>
 		
 		<?foreach($heads as $k => $v):?>
-		<th><?=$v['label']?></th>
+		<?=$v?>
 		<?endforeach;?>
 	
 	</tr></thead>

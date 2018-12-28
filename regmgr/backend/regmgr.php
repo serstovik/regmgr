@@ -30,55 +30,125 @@ class mwRegmgr extends mwController
 
 		$tData		= [];
 		
-		$columns_cfg = rmCfg()->getBranch('backend', 'index');
-		
-		$table_heads = [];
-		foreach( $columns_cfg as $c_k => $c_v ) {
-			
-			//create table header
-			$table_heads[] = [
-				'label' => $c_v['label']
-			];
-			
-			//init column widget
-			//$column_widget = ...
-			
-			//trying to load special widget for column
-			$column_widget = $this->load->widget('RMDesktopEx', $c_k);
-
-			if ( !$column_widget )
-				$column_widget = $this->load->widget('RMDesktopEx', 'base');
-			
-			//prepare column data
-			foreach($rows as $r_k => $r_v) {
-				
-				//init columns array
-				if ( !isset($rows[$r_k]) )
-					$rows[$r_k]['RMColumns'] = [];
-				
-				//generate column html
-				$rows[$r_k]['RMColumns'][] = $column_widget->render($c_k, $c_v['value'], $r_v);
-				
-			}
-			
-		}
-		
-		$desk_list = $this->load->widgets('RMDesktopEx');
-
-		$this->loadContent('table', 'index', array(
-			'heads' => $table_heads,
-			'rows' => $rows
-		));
+		$this->_renderIndex($rows, $tData);
 		
 		if ( $this->isAjax )
 			return;
-		
+
 		$this->load->editor('applicationEd')->loadJS();
 
 		return $this->loadIndex('desktop');
 
 	} //FUNC index
-
+	
+	function _renderIndex($rows, $tData) {
+		
+		$columnsCFG = rmCfg()->getBranch('backend', 'index');
+		//__($columns_cfg);
+		
+		//heads for index
+		$tableHeads = [];
+		
+		//loop index part of config
+		foreach( $columnsCFG as $cfgKey => $cfgVal ) {
+			
+			$columnWidget = false;
+			
+			//init column widget
+			//check is there no extension in config - use base column render
+			if ( empty($cfgVal['extension']) ) {
+				
+				$widget		= 'base';
+				$method		= 'column';
+				
+			}// base column render
+			else { //exstension is added to config
+				
+				//expected extension built from 2 parts
+				//extention name and column method name
+				$ext = explode('.', $cfgVal['extension']);
+				
+				//check is both parameters (extention name and method) provided
+				//additional parameters (3+) will be ignored and provided as part of config to extention
+				if ( sizeof($ext) >= 2 ) {
+					
+					$widget		= $ext[0];
+					$method		= 'column_' . $ext[1];
+					
+					//trying to load extention
+					$columnWidget = $this->load->widget('RMDesktopEx', $widget);
+					
+					//check is such extention and column method exists - use default column if no
+					if ( !$columnWidget or !method_exists($columnWidget, $method) ) {
+						
+						$columnWidget	= false; //reset widget to reload it after with base widget
+						$widget		= 'base';
+						$method		= 'column';
+						
+					}// use default column
+					
+				} //both parameter provided
+				else { // 1 parameter provided - use default column
+					
+					$widget		= 'base';
+					$method		= 'column';
+					
+				}
+				
+			}
+			
+			//check is widget loaded
+			//no widget or no method for widget
+			if ( !$columnWidget ) {
+				
+				//load base widget
+				$columnWidget = $this->load->widget('RMDesktopEx', $widget);
+				
+				
+			}
+			
+			//check is current column is "head" - <th>
+			if ( !empty($cfgVal['class']) and strpos($cfgVal['class'], 'head') != -1 ) {
+			
+				$cellWrap = 'th';
+				
+			}
+			else {
+				
+				$cellWrap = 'td';
+				
+			}
+			
+			//generate and push table header
+			$tableHeads[] = '<' . $cellWrap . '>' . $cfgVal['label'] . '</' . $cellWrap . '>';
+			
+			//prepare column data
+			foreach($rows as $rowKey => $rowVal) {
+				
+				//init columns array
+				if ( !isset($rows[$rowKey]) )
+					$rows[$rowKey]['RMColumns'] = [];
+				
+				//generate cell html
+				$cellHtml = call_user_func( [$columnWidget, '_ob_' . $method], $cfgKey, $rowVal, $cfgVal );
+				
+				//wrap template on in cell tag
+				$cellHtml = '<' . $cellWrap . '>' . $cellHtml . '</' . $cellWrap . '>';
+				
+				//generate column html
+				$rows[$rowKey]['RMColumns'][] = $cellHtml;
+				
+			}
+			
+		}
+		
+		$this->loadContent('table', 'index', array(
+			'heads' => $tableHeads,
+			'rows' => $rows
+		));
+		
+	} //FUNC _renderIndex
+	
 /* ==== Helpers ============================================================================================================= */
 
 	function _getHeaders (){
