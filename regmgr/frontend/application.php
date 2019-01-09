@@ -231,15 +231,8 @@ class mwApplication extends mwController {
 
 	function test () {
 
-		$wgts	= $this->load->widgets('RMApplicationEx');
-		//__($wgts);
-
-
-
-		$wgt = $this->load->widget('RMApplicationEx', 'eShopForms');
-		__($wgt);
+		(new mwEvent('regmgr.status.new'))->trigger([]);
 
 	} //FUNC test
-
 
 }//CLASS mwApplication
