@@ -20,4 +20,12 @@ class mwRMEditorEx extends mwWidget {
 	function editor () {
 	} //FUNC editor
 
+	function validate ($data) {
+		return $data;
+	} //FUNC validate
+
+	function save ($data) {
+		return $data;
+	} //FUNC save
+
 } //CLASS mwRMEditorEx

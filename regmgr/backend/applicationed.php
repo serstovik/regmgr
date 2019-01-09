@@ -27,7 +27,7 @@ class mwApplicationEd extends mwEditor {
 	public	$extensions		= [];					// Extensions instances.
 
 	public	$dialogWidth		= 1200;
-	public	$panelWidth		= 30;
+	public	$panelWidth		= 40;
 	public	$minPanelWidth		= 300;
 
 	function __init	() {
@@ -78,20 +78,78 @@ class mwApplicationEd extends mwEditor {
 
 // ---- CONTRIOLLERS -----------------------------------------------------------------------------------------------------------	
 	
-	/** //** ----= save	=--------------------------------------------------------------------------------------\**//** \
+	/** //** ----= validate	=--------------------------------------------------------------------------------------\**//** \
 	*
-	*	Custom save operation.
+	*	Validates given item data using DBObject and throws exception in case of error.
+	*
+	*	@param	array	$data	- Item data to validate.
 	* 
-	* 	@param	int	[$id] 	- Item ID to save.
+	* 	@return	array		- Validated (updated) item data.
 	*
 	\**//** -------------------------------------------------------------------= by Mr.V!T @ Morad Media Inc. =----/** //**/
-	function save ($id = '') {
+	function onValidate ($data) {
 
-	//	__($_POST);
+		// Loading extensions
+		$ext	= $this->loadExtensions();
 
-		return parent::save($id);
+		// Preparing validations array
+		$v = [];
+	
+		// Looping through extensions and validating with each, collecting all validations together
+		foreach ( $ext as $name => $obj ) {
 
-	} //FUNC save
+			// Skipping ones who don't have post coming
+			if ( empty($data['extensions'][$obj->extName]) )
+				continue;
+			
+			// Issuing and collecting validations
+			try {
+				
+				// Validating extension data in POST and saving it back
+				$data['extensions'][$obj->extName] = $obj->validate($data['extensions'][$obj->extName]);
+				
+			} catch ( mwValidationEx $e ) {
+				
+				// Converting input names and adding into collection
+				$res = $e->Results;
+				foreach ( $res as $eName => $messages )
+					$v["extensions[{$obj->extName}][{$eName}]"] = $messages;
+				
+			} //CATCH
+			
+		} //FOR each extension
+
+		// If there where validation issues - need to throw this as exception
+		if ( $v )
+			throw( new mwValidationEx('Wrong info provided.', $v, $this->EditorName) );
+
+		return $data;
+		
+	} //FUNC onValidate
+	
+	/** //** ----= onBeforeSave	=--------------------------------------------------------------------------------------\**//** \
+	*
+	*	Occurs after object was initiated with POST data, but before it was saved in DB.
+	* 
+	\**//** -------------------------------------------------------------------= by Mr.V!T @ Morad Media Inc. =----/** //**/
+	function onBeforeSave ($item) {
+
+		// Loading extensions
+		$ext	= $this->loadExtensions();
+
+		// Looping through and saving if post have something
+		foreach ( $ext as $name => $obj ) {
+
+			// Skipping ones who don't have post coming
+			if ( empty($this->Item->extensions[$obj->extName]) )
+				continue;
+			
+			// Issuing save, passing extension data and saving it back
+			$this->Item->extensions[$obj->extName] = $obj->save($this->Item->extensions[$obj->extName]);
+				
+		} //FOR each extension
+
+	} //FUNC onBeforeSave
 
 // ---- VIEWS ------------------------------------------------------------------------------------------------------------------	
 			
@@ -163,6 +221,7 @@ class mwApplicationEd extends mwEditor {
 					<input type="hidden" name="id" value="" />
 					<input type="hidden" name="sn" value="" />
 					<input type="hidden" name="type" value="" />
+					<input type="hidden" name="user_id" value="" />
 					<input type="hidden" name="statusmajor" value="" />
 					<input type="hidden" name="statusminor" value="" />
 
@@ -263,15 +322,27 @@ class mwApplicationEd extends mwEditor {
 	
 		// Defining extension name
 		if ( !$obj->extName )
-			$obj->extName = $obj->WidgetName;
+			$obj->extName	= $obj->WidgetName;
 		
 		// Setting up extension
 		$obj->application	= $this->Item;
-		$obj->data		= ( !empty($this->Item->extensions[$obj->extName]) ) ? $this->Item->extensions[$obj->extName] : [];
+		
+		// Making sure extension data is set for feedback
+		if ( empty($this->Item->extensions[$obj->extName]) )
+			$this->Item->extensions[$obj->extName] = [];
+		
+		// Passing it into extension
+		// Using pointer linking for feedback
+		$obj->data 		= &$this->Item->extensions[$obj->extName];
 		
 		// Getting editor HTML
 		$html	= call_user_func([$obj, '_ob_'.$method]); 
-
+		
+		// Updating ajax data with updated data
+		// Have to do this directly in loader to object enforcemeent (for JS)
+		// ToDo: Need to find better way of data merging for editors
+		$this->load->sysCache['Data'][$this->DataName][$this->ID]->extensions = $this->Item->extensions;
+	
 	// ---- Inputs ----
 		
 		// Parsing editor inputs and converting them into array format
@@ -303,8 +374,26 @@ class mwApplicationEd extends mwEditor {
 		if ( !empty($this->extensions) )
 			return $this->extensions;
 
+		// Making sure DB object is set
+		$this->setDBObject();
+
 		// Loading exensions widgets
 		$this->extensions	= $this->load->widgets('RMEditorEx');
+
+		// Looping through extensions and preparing each
+		foreach ( $this->extensions as $name => $obj ) {
+
+			// Defining extension name
+			if ( !$obj->extName )
+				$obj->extName	= $obj->WidgetName;
+			
+			// Setting up object
+			$obj->application = $this->Item;
+			
+			// Providing link to extension data
+			$obj->data	= &$this->Item->extensions[$obj->extName];
+			
+		} //FOR each extension
 
 		// Done
 		return $this->extensions;

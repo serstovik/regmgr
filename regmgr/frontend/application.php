@@ -160,6 +160,11 @@ class mwApplication extends mwController {
 
 		$Attacher->uploadAndSaveDocument();
 
+	// ---- User ----
+	
+		// Setting up current user
+		$app->userId	= User::ID();
+
 	// ---- DB ----
 
 		// Making sure table is up to date
