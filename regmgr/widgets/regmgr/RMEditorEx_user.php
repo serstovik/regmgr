@@ -12,10 +12,6 @@ class mwRMEditorEx_user extends mwRMEditorEx {
 
 	public	$user	= false;
 
-	public	$tabs	= [
-		'contact'	=> 'Contact',
-	]; //$tabs
-
 	function editor_contact () {
 		
 		// Loading user, group and form
@@ -31,7 +27,7 @@ class mwRMEditorEx_user extends mwRMEditorEx {
 			unset($data[$f]);
 
 		// Merging data to make sure to keep source data
-		$this->data += $data;
+		$this->data	+= $data;
 
 		// Using first loaded form. RegMgr is designed to keep users in one group 
 		// (unless special user, which will be edited through users section anyway)

@@ -56,14 +56,14 @@ class rmCfg extends vObject {
 
 	} //FUNC initCfg
 
-	function get ($param = '') {
+	function get ($param = '', $default = false) {
 /**/
 		if ( $param )
 			if ( isset($this->cfg['core'][$param]) ) {
 				return $this->cfg['core'][$param];
 			} //IF parameter set in core
 			else {
-				return false;
+				return $default;
 			} //IF no param
 /**/
 		return $this->cfg;

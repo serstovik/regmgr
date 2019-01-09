@@ -8,7 +8,6 @@
 * 	@category	widget
 *
 \**//** ------------------------------------------------------------------------= by SerStoVik @ Morad Media Inc. =----/** //**/
-
 class mwRMApplicationEx extends mwWidget {
 
 	public	$extName	= '';		// Extension name. If omited - widget name will be used.

@@ -6,11 +6,6 @@
  *\**//** ----------------------------------------------------------------= by SerStoVik @ Morad Media Inc.	=------/** //**/
 class mwRMEditorEx_eShop extends mwRMEditorEx {
 
-	public	$tabs	= [
-		'products'	=> 'Products',
-	//	'forms'		=> 'Forms',
-	]; //$tabs
-
 	function editor_products () {
 
 	// ---- Cart ----

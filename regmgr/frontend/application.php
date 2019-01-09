@@ -184,7 +184,7 @@ class mwApplication extends mwController {
 		//submit != 1 - save and return clicked
 		else {
 			
-			
+			$app->setStatus(RM_STATUS_OPEN);
 			
 		}
 		//__($_POST, $app);

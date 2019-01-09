@@ -43,10 +43,7 @@ class mwApplicationEd extends mwEditor {
 			// Validating type agains registered types
 			$types = array_keys( rmCfg()->getTypes() );
 
-			if (
-				!isAlnum($_REQUEST['type'])
-				or !in_arrayi($_REQUEST['type'], $types)
-			)
+			if ( !in_arrayi($_REQUEST['type'], $types) )
 				throw( new Exception('Invalid type specified.') );
 
 			// Saving type in self
@@ -222,8 +219,8 @@ class mwApplicationEd extends mwEditor {
 					<input type="hidden" name="sn" value="" />
 					<input type="hidden" name="type" value="" />
 					<input type="hidden" name="user_id" value="" />
-					<input type="hidden" name="statusmajor" value="" />
-					<input type="hidden" name="statusminor" value="" />
+					<input type="hidden" name="status_major" value="" />
+					<input type="hidden" name="status_minor" value="" />
 
 					<div class="winContent flex full" id="<?=$this->EditorName?>_formContents"><?=$html?></div>
 	
@@ -244,14 +241,42 @@ class mwApplicationEd extends mwEditor {
 
 	function listTabs ( ) {
 
-		$wgts = $this->loadExtensions();
+		// ToDo: Merge ->listTabs() with ->loadExtensions();
 
+		$wgts = $this->loadExtensions();
+		
+		$cfg = rmCfg()->getBranch('backend', 'editor');
+		
 		$tabs = [];
 
 		$i = 0;
 
 		foreach ( $wgts as $name => $w ) {
+			
+			$ext = explode('.', $cfg[$name]['extension']);
+			
+			//check is both parameters (extention name and method) provided
+			//additional parameters (3+) will be ignored and provided as part of config to extention
+			if ( sizeof($ext) >= 2 ) {
+				
+				//$widget		= $ext[0];
+				$method		= 'editor_' . $ext[1];
+				
+				$tabs['tab_' . $name] = [
 
+					'name'		=> $name,			// Tab short name
+					'widget'	=> $w,				// Extension widget
+					'method'	=> $method,			// Expected renderer method
+					'caption'	=> $cfg[$name]['caption'],	// Tab visible caption
+					'selected'	=> $i == 0,			// Default tab marker
+
+				]; //$tabs
+
+				$i++;
+				
+			}
+			
+			/*
 			foreach ( $w->tabs as $tName => $cap ) {
 
 				$tabs[$name.'_'.$tName] = [
@@ -267,7 +292,8 @@ class mwApplicationEd extends mwEditor {
 				$i++;
 
 			} //FOR each tab in extension
-
+			*/
+			
 		} //FOR each extension tab
 
 		// ToDo: implement widgets sorting from config
@@ -323,7 +349,7 @@ class mwApplicationEd extends mwEditor {
 		// Defining extension name
 		if ( !$obj->extName )
 			$obj->extName	= $obj->WidgetName;
-		
+
 		// Setting up extension
 		$obj->application	= $this->Item;
 		
@@ -365,7 +391,9 @@ class mwApplicationEd extends mwEditor {
 	} //FUNC winTabsContents
 
 	function loadExtensions ( $force = false ) {
-
+		
+		$cfg = rmCfg()->getBranch('backend', 'editor');
+		
 		// If forced - resetting extensions cache
 		if ( $force )
 			$this->extensions = [];
@@ -378,8 +406,41 @@ class mwApplicationEd extends mwEditor {
 		$this->setDBObject();
 
 		// Loading exensions widgets
-		$this->extensions	= $this->load->widgets('RMEditorEx');
 
+		//$this->extensions	= $this->load->widgets('RMEditorEx');
+		
+		$this->extensions = [];
+		
+		//loop index part of config
+		foreach( $cfg as $cfgKey => $cfgVal ) {
+			
+			$columnWidget = false;
+			
+			
+			//expected extension built from 2 parts
+			//extention name and column method name
+			$ext = explode('.', $cfgVal['extension']);
+			
+			//check is both parameters (extention name and method) provided
+			//additional parameters (3+) will be ignored and provided as part of config to extention
+			if ( sizeof($ext) >= 2 ) {
+				
+				$widget		= $ext[0];
+				//$method		= 'editor_' . $ext[1];
+				
+				//trying to load extention
+				$this->extensions[$cfgKey] = $this->load->widget('RMEditorEx', $widget);
+								
+			} //both parameter provided
+			else { // 1 parameter provided
+				
+				//not sure what to do
+				
+			}
+			
+			
+		}
+		
 		// Looping through extensions and preparing each
 		foreach ( $this->extensions as $name => $obj ) {
 
