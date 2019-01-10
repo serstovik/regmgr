@@ -23,7 +23,6 @@
 	 	if (empty($appId))
 			$appId	= $this->application->id;
 		
-	 	__($appId);
 		$notes	= $this->getNotes($appId);
 		//__($notes);
 		if ($notes && is_array($notes)){
@@ -34,8 +33,8 @@
 
 				$notesHtml	.= "<dl  class='mwDialog' id='".$note['id']."'>";
 
-				$notesHtml	.= '<dt class="rmnotes-date"><strong>Date:</strong> '.$note['modified'].'</dt>';
-				$notesHtml	.= '<dt class="rmnotes-text"><strong>Note:</strong> '.$note['text'].'</dt>';
+				$notesHtml	.= '<dt class="rmnotes-date"><strong>Date: </strong>'.$note['modified'].'</dt>';
+				$notesHtml	.= '<dt class="rmnotes-text"><strong>Note: </strong>'.$note['text'].'</dt>';
 				$notesHtml	.= '<br/>';
 
 				$notesHtml	.= '<div class="rmnotes-update-section '.$note['id'].'"><textarea name="update_note_'.$note['id'].'"></textarea></div>';

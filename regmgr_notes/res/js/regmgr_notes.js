@@ -54,8 +54,8 @@ var rmNotes	=  (function () {
 									// var $newEl	= $this.dom.wrapper.find('dl').last('dl').clone();
 									//update element Data
 									var newEl = "<dl class='mwDialog' id='" + $data.content.id + "'>";
-									newEl += "<dt class='rmnotes-date'><strong>Date:</strong>'" + $data.content.modified + "'</dt>";
-									newEl += "<dt class='rmnotes-text'><strong>Note:</strong>'" + $data.content.text + "'</dt>";
+									newEl += "<dt class='rmnotes-date'><strong>Date: </strong>" + $data.content.modified + "</dt>";
+									newEl += "<dt class='rmnotes-text'><strong>Note: </strong>" + $data.content.text + "</dt>";
 									newEl += "<br>";
 									newEl += "<div class='rmnotes-update-section " + $data.content.id + "' style='display: none;'>";
 									newEl += "<div class='rmnotes-update-section " + $data.content.id + "'>";
@@ -66,6 +66,9 @@ var rmNotes	=  (function () {
 									newEl += "<hr></dl>";
 
 									jQuery(newEl).appendTo($this.dom.wrapper);
+
+									//clear textbox
+									$this.dom.textArea.val('');
 
 									addClicks();
 
