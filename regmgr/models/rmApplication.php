@@ -116,9 +116,22 @@ class rmApplication extends vDBObject {
 	} //FUNC init
 	
 	function getList ($options = []) {
-
+		
+		$where = '';
+		
+		if ( !empty($options['type']) ) {
+			
+			if ( empty($where) )
+				$where = ' WHERE ';
+			else
+				$where .= ' AND ';
+			
+			$where .= 'type = \'' . $options['type'] . '\'';
+				
+		}
+		
 		// Loading items from DB
-		$sql	= "SELECT * FROM {$this->Table}";
+		$sql	= "SELECT * FROM {$this->Table}" . $where;
 		$res	= mwDB()->query($sql)->asArray('id'); 
 
 		// Post processing

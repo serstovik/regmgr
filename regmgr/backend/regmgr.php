@@ -19,15 +19,18 @@ class mwRegmgr extends mwController
 
 	} //_init()
 
-	function index () {
+	function index ($type = '') {
 
 		$app		= new rmApplication();
 		
 		// Ensuring applications DB meets minimum requirements
 		$app->createTable()->updateTable();
 		
-		$rows		= $app->getList();
-
+		$option = [];
+		if ( !empty($type) ) $option['type'] = $type;
+		
+		$rows		= $app->getList($option);
+		
 		$tData		= [];
 		
 		$this->_renderIndex($rows, $tData);
