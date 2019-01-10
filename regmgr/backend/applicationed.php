@@ -145,7 +145,10 @@ class mwApplicationEd extends mwEditor {
 			$this->Item->extensions[$obj->extName] = $obj->save($this->Item->extensions[$obj->extName]);
 				
 		} //FOR each extension
-
+		
+		//trigger status event
+		(new mwEvent('regmgr.status.' . $this->Item->statusMajor))->trigger($this->Item);
+		
 	} //FUNC onBeforeSave
 
 // ---- VIEWS ------------------------------------------------------------------------------------------------------------------	
@@ -255,26 +258,23 @@ class mwApplicationEd extends mwEditor {
 			
 			$ext = explode('.', $cfg[$name]['extension']);
 			
-			//check is both parameters (extention name and method) provided
-			//additional parameters (3+) will be ignored and provided as part of config to extention
-			if ( sizeof($ext) >= 2 ) {
-				
-				//$widget		= $ext[0];
+			//check is method provided in cofing
+			if ( sizeof($ext) > 1 )
 				$method		= 'editor_' . $ext[1];
-				
-				$tabs['tab_' . $name] = [
+			else //use default method if not
+				$method		= 'editor';
+			
+			$tabs['tab_' . $name] = [
 
-					'name'		=> $name,			// Tab short name
-					'widget'	=> $w,				// Extension widget
-					'method'	=> $method,			// Expected renderer method
-					'caption'	=> $cfg[$name]['caption'],	// Tab visible caption
-					'selected'	=> $i == 0,			// Default tab marker
+				'name'		=> $name,			// Tab short name
+				'widget'	=> $w,				// Extension widget
+				'method'	=> $method,			// Expected renderer method
+				'caption'	=> $cfg[$name]['caption'],	// Tab visible caption
+				'selected'	=> $i == 0,			// Default tab marker
 
-				]; //$tabs
+			]; //$tabs
 
-				$i++;
-				
-			}
+			$i++;
 			
 			/*
 			foreach ( $w->tabs as $tName => $cap ) {
@@ -416,29 +416,27 @@ class mwApplicationEd extends mwEditor {
 			
 			$columnWidget = false;
 			
-			
-			//expected extension built from 2 parts
-			//extention name and column method name
+			//can be 1 or more parts, 1st part always widget name
 			$ext = explode('.', $cfgVal['extension']);
+			$widget	= $ext[0];
 			
-			//check is both parameters (extention name and method) provided
-			//additional parameters (3+) will be ignored and provided as part of config to extention
-			if ( sizeof($ext) >= 2 ) {
+			$this->extensions[$cfgKey] = $this->load->widget('RMEditorEx', $widget);
+			/*
+			//check is widget exists
+			if ( $this->extensions[$cfgKey] ) {
 				
-				$widget		= $ext[0];
-				//$method		= 'editor_' . $ext[1];
+				// Defining extension name
+				if ( !$this->extensions[$cfgKey]->extName )
+					$this->extensions[$cfgKey]->extName = $this->extensions[$cfgKey]->WidgetName;
 				
-				//trying to load extention
-				$this->extensions[$cfgKey] = $this->load->widget('RMEditorEx', $widget);
-								
-			} //both parameter provided
-			else { // 1 parameter provided
+				// Setting up object
+				$this->extensions[$cfgKey]->application = $this->Item;
 				
-				//not sure what to do
+				// Providing link to extension data
+				$this->extensions[$cfgKey]->data	= &$this->Item->extensions[$this->extensions[$cfgKey]->extName];
 				
 			}
-			
-			
+			*/
 		}
 		
 		// Looping through extensions and preparing each
@@ -455,7 +453,7 @@ class mwApplicationEd extends mwEditor {
 			$obj->data	= &$this->Item->extensions[$obj->extName];
 			
 		} //FOR each extension
-
+		
 		// Done
 		return $this->extensions;
 

@@ -7,7 +7,7 @@
 class mwRMEditorEx_status extends mwRMEditorEx
 {
 
-	function editor_approval () {
+	function editor () {
 		
 		//__($this->application->statusList);
 		//__($this->data);
@@ -106,6 +106,6 @@ class mwRMEditorEx_status extends mwRMEditorEx
 		});
 		</script>
 		<?php
-	} //FUNC editor_approval
+	} //FUNC editor
 
 } //CLASS mwRMEditorEx_status

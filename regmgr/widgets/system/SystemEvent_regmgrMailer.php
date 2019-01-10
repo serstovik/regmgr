@@ -25,11 +25,72 @@ class mwSystemEvent_regmgrMailer extends mwSystemEvent {
 	*
 	\**//** -------------------------------------------------------------------= by Mr.V!T @ Morad Media Inc. =----/** //**/
 	function trigger ($event, $data) {
-
 		
-
+		//__($event, $data);
+		
+		$data = $data->asArray();
+		
+		//check is this status event
+		if ( !empty($event->descriptor[1]) and $event->descriptor[1] == 'status' ) {
+			
+			if ( !empty($event->descriptor[2]) ) {
+				
+				$cfg = rmCfg()->getEmails('status.' . $event->descriptor[2]);
+				//__($cfg);
+				
+				foreach( $cfg as $k => $v ) {
+					
+					$to = $v['to'];
+					$from = $v['from'];
+					$subject = arrayToTemplate($data, $v['subject']);
+					
+					$user = $this->getUsers($data['userId']);
+					//__($user);
+					if ( is_array($user) )
+						$data = array_merge($user, $data);
+					//__($data);
+					$file = compilePath(SITE_TEMPLATES_PATH, 'regmgr/emails', $v['template']);
+					$body = loadView($file, $data);
+					//__($to, $from, $body, $subject);
+					$this->email($to, $from, $body, $subject);
+					
+				}
+			}
+			
+		}
+		
+		return;
 		
 	} //FUNC trigger
-
+	
+	function email( $to, $from, $body, $subject  ) {
+		//__($to, $from, $body, $subject);
+		loadVITLib('email');
+		$mail = new vMailer();
+		$mail->To = $to;
+		$mail->From = $from;
+		$mail->Body = $body;
+		$mail->Subject = $subject;
+		$mail->send();
+		
+		return true;
+		
+	} //FUNC email
+	
+	function getUsers($id = 0) {
+		
+		if ( !$id ) return false;
+		
+		$where = 'WHERE id = ' . $id;
+		
+		return mwDB()->query('
+			SELECT
+			  *
+			FROM users
+			' . $where . '
+		')->asArray('id');
+		
+	} //METHOD getUsers
+	
 } //CLASS mwSystemEvent_regmgrMailer
 ?>
