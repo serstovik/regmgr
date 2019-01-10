@@ -1,4 +1,7 @@
 <?php
+//todo: link  by id
+//todo: save as separate strings w\o serialization
+//todo: add file name
 /** //** ----= CLASS mwRMEditorEx_attach	=----------------------------------------------------------------------\**//** \
  *
  * 	@package        Morweb
@@ -21,10 +24,11 @@
 		$files 		= $Attacher->getFiles($this->application->sn);
 		if (!empty($files['files']))
 			$files	= unserialize($files['files']);
+
 		$cnt	= 1;
 		$htmlFiles	= '<ul>';
-		foreach	($files as $file){
-			$htmlFiles	.= '<li><a href="/files/regmgr/'.$file.'" target="_blank">File '.$cnt.'</a></li>';
+		foreach	($files as $name => $file){
+			$htmlFiles	.= '<li><a href="/files/regmgr/'.$file.'" target="_blank">'.ucfirst($name).'</a></li>';
 			$cnt++;
 		} //FOREACH
 

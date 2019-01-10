@@ -19,7 +19,9 @@ class rmAttach  extends vDBObject
 	public	$id			= 0;				// DB id.
 	public	$sn			= '';				// Application unique SN.
 
-	public 	$files			= [];
+	// -- files
+	public 	$cv			= '';
+	public 	$bio			= '';
 
 	public	$modified		= '';				// |
 	public	$created		= '';				// |- Creation and last modification dates.
@@ -29,7 +31,8 @@ class rmAttach  extends vDBObject
 		$this
 			->setField('id')->Validations('isID')
 			->setField('sn')->Validations('trim|isSN(A)')
-			->setField('files')->SZ()
+			->setField('cv')->Validations('trim')
+			->setField('bio')->Validations('trim')
 			->setField('modified')->Validations('')->DB(true, VDBO_DB_READ)->dbType('timestamp', false, true, true)
 			->setField('created')->Validations('')->DB(true, VDBO_DB_READ)->dbType('timestamp', false, 'CURRENT_TIMESTAMP', false); //OBJECT $this
 
@@ -38,13 +41,13 @@ class rmAttach  extends vDBObject
 	}
 
 	function uploadAndSaveDocument() {
-
+		//we have more then one document
 		if( is_array($_FILES) and count($_FILES) > 1) {
 			foreach($_FILES as $name => $file) {
 				if($file['name'] && $file['type']){
 					$fileName = $this->uploadImages($name);
 					if ($fileName)
-						$_POST['files'][]	= $fileName;
+						$_POST[$name]	= $fileName;
 				} //IF
 			}//FOREACH
 		}//IF
@@ -52,16 +55,16 @@ class rmAttach  extends vDBObject
 		elseif(is_array($_FILES) and count($_FILES) == 1) {
 			if ($_FILES['name'] && $_FILES['type'])
 				$fileName = $this->uploadImages($_FILES['name']);
+				//todo: check how it works with one file
 				if ($fileName)
 					$_POST['files'][]	= $fileName;
 
 		}//IF
 		
 		$this->sn	=  $_POST['sn'];
-
+		
 		// Making sure table is up to date
 		$this->createTable()->updateTable();
-
 		// And saving data into DB
 		$this->fromArray($_POST)->toDB();
 
@@ -69,7 +72,11 @@ class rmAttach  extends vDBObject
 	
 	function getFiles($sn){
 
-		$sql	= "SELECT files FROM {$this->Table} WHERE sn = '{$sn}'";
+		$sql	= "SELECT `cv`, `bio` FROM {$this->Table} WHERE sn = '{$sn}'";
+
+		// Making sure table is up to date
+		$this->createTable()->updateTable();
+
 		return mwDB()->query($sql)->asRow();
 
 	}
