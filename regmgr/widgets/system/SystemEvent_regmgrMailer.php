@@ -29,6 +29,7 @@ class mwSystemEvent_regmgrMailer extends mwSystemEvent {
 		//__($event, $data);
 		
 		$data = $data->asArray();
+		//__($data);
 		
 		//check is this status event
 		if ( !empty($event->descriptor[1]) and $event->descriptor[1] == 'status' ) {
@@ -40,11 +41,17 @@ class mwSystemEvent_regmgrMailer extends mwSystemEvent {
 				
 				foreach( $cfg as $k => $v ) {
 					
-					$to = $v['to'];
-					$from = $v['from'];
+					$user = $this->getUsers($data['user_id']);
+					$adminEmail = mwCfg('System/AdminEmail');
+					
+					$to = str_replace('@user', $user['email'], $v['to']);
+					$to = str_replace('@admin', $adminEmail, $to);
+					
+					$from = str_replace('@user', $user['email'], $v['from']);
+					$from = str_replace('@admin', $adminEmail, $from);
+					
 					$subject = arrayToTemplate($data, $v['subject']);
 					
-					$user = $this->getUsers($data['userId']);
 					//__($user);
 					if ( is_array($user) )
 						$data = array_merge($user, $data);
@@ -88,7 +95,7 @@ class mwSystemEvent_regmgrMailer extends mwSystemEvent {
 			  *
 			FROM users
 			' . $where . '
-		')->asArray('id');
+		')->asRow();
 		
 	} //METHOD getUsers
 	
