@@ -20,7 +20,7 @@ class mwRmNotes extends mwController {
 
  		$this->load()->model('rmnotes');
  		$RMNotes	=  new rmNotes();
- 		$RMNotes->createTable()->updateTable();
+
 
  		$notesData	= ['app_id' => $appId, 'user_id' => $userId, 'text' => $text];
 		$res 		= $RMNotes->fromArray($notesData)->toDB();

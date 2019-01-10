@@ -16,6 +16,10 @@
 
 	 function editor_notes ($appId = '') {
 
+	 	$this->load->model('rmnotes');
+	 	$RMNotes	= new rmNotes();
+	 	$RMNotes->createTable()->updateTable();
+
 	 	if (empty($appId))
 			$appId	= $this->application->id;
 
