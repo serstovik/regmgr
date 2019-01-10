@@ -64,8 +64,8 @@ var rmNotes	=  (function () {
 									newEl += "<div class='rmnotes-update-section " + $data.content.id + "'>";
 									newEl += "<textarea name='update_note_" + $data.content.id + "'></textarea>";
 									newEl += "</div></div>";
-									newEl += "<button rel='" + $data.content.id + "' class='rmnotes-edit-btn " + $data.content.id + "'>Update</button>";
-									newEl += "<button rel='" + $data.content.id + "' class='rmnotes-remove-btn'>Remove</button>";
+									// newEl += "<button rel='" + $data.content.id + "' class='rmnotes-edit-btn " + $data.content.id + "'>Update</button>";
+									// newEl += "<button rel='" + $data.content.id + "' class='rmnotes-remove-btn'>Remove</button>";
 									newEl += "<hr></dl>";
 
 									jQuery(newEl).appendTo($this.dom.wrapper);

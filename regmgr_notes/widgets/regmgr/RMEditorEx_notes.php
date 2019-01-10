@@ -35,8 +35,8 @@
 
 				$notesHtml	.= '<div class="rmnotes-update-section '.$note['id'].'"><textarea name="update_note_'.$note['id'].'"></textarea></div>';
 
-				$notesHtml	.= '<button rel="'.$note['id'].'" class="rmnotes-edit-btn '.$note['id'].'">Update</button>';
-				$notesHtml	.= '<button rel="'.$note['id'].'" class="rmnotes-remove-btn">Remove</button>';
+				//$notesHtml	.= '<button rel="'.$note['id'].'" class="rmnotes-edit-btn '.$note['id'].'">Update</button>';
+				//$notesHtml	.= '<button rel="'.$note['id'].'" class="rmnotes-remove-btn">Remove</button>';
 				$notesHtml	.= '<hr />';
 
 				$notesHtml	.= '</dl>';
