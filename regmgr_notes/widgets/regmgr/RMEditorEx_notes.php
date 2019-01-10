@@ -23,7 +23,6 @@
 	 	if (empty($appId))
 			$appId	= $this->application->id;
 		
-	 	__($appId);
 		$notes	= $this->getNotes($appId);
 		//__($notes);
 		if ($notes && is_array($notes)){
