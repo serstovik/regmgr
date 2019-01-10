@@ -176,16 +176,14 @@ class mwApplication extends mwController {
 			//change status to submit only for new or saved apps
 			if ( in_array($this->statusMajor, [RM_STATUS_NEW, RM_STATUS_OPEN]) ) {
 			
-				//$app->setStatus(RM_STATUS_SUBMIT);
 				$app->statusMajor = RM_STATUS_SUBMIT;
-				
+
 			}//change status to submit
 
 		}// submit button clicked
 		//submit != 1 - save and return clicked
 		else {
 			
-			//$app->setStatus(RM_STATUS_OPEN);
 			$app->statusMajor = RM_STATUS_OPEN;
 			
 		}
