@@ -67,6 +67,9 @@ var rmNotes	=  (function () {
 
 									jQuery(newEl).appendTo($this.dom.wrapper);
 
+									//clear textbox
+									$this.dom.textArea.val('');
+
 									addClicks();
 
 								}) //FUNC success
