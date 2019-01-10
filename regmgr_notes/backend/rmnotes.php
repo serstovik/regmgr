@@ -10,7 +10,7 @@
 class mwRmNotes extends mwController {
 
 	function addNote(){
-
+		
  		if (!isset($_POST['appId']) || empty($_POST['appId']))
  			return false;
 
@@ -20,7 +20,6 @@ class mwRmNotes extends mwController {
 
  		$this->load()->model('rmnotes');
  		$RMNotes	=  new rmNotes();
-
 
  		$notesData	= ['app_id' => $appId, 'user_id' => $userId, 'text' => $text];
 		$res 		= $RMNotes->fromArray($notesData)->toDB();

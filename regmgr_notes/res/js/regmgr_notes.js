@@ -4,11 +4,9 @@ var RM_BACKEND_NOTES_AJAX = '/site/ajax/regmgr_notes/rmnotes';
 var rmNotes	=  (function () {
 
 	var rmNotesIsCalled = false;
-	console.log(9999);	
 	return function () {
 
 		if (!rmNotesIsCalled) {
-			console.log(101010);
 			rmNotesIsCalled = true;
 
 			return vEventObject([], {
@@ -43,7 +41,8 @@ var rmNotes	=  (function () {
 
 							e.preventDefault();
 							//TODO: SEND appId
-							var $appId = jQuery(this).attr('rel');
+							var $appId = jQuery(this).find('input').attr('rel');
+
 							var $params = {};
 							$params.appId = $appId;
 							$params.text = $this.dom.textArea.val();
@@ -53,9 +52,7 @@ var rmNotes	=  (function () {
 								.success(function ($data) {
 
 									// var $newEl	= $this.dom.wrapper.find('dl').last('dl').clone();
-
 									//update element Data
-
 									var newEl = "<dl class='mwDialog' id='" + $data.content.id + "'>";
 									newEl += "<dt class='rmnotes-date'><strong>Date:</strong>'" + $data.content.modified + "'</dt>";
 									newEl += "<dt class='rmnotes-text'><strong>Note:</strong>'" + $data.content.text + "'</dt>";

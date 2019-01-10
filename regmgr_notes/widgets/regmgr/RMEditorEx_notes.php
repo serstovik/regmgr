@@ -22,7 +22,8 @@
 
 	 	if (empty($appId))
 			$appId	= $this->application->id;
-
+		
+	 	__($appId);
 		$notes	= $this->getNotes($appId);
 		//__($notes);
 		if ($notes && is_array($notes)){
@@ -49,7 +50,10 @@
 
 			$notesHtml	.= '</section>';
 
-		} // if
+		}
+		else {
+			$notesHtml	= '<section id="rmnotes_list"></section>';
+		}
 
 		echo $notesHtml;
 	?>
@@ -58,8 +62,12 @@
 
 			<dt>Admin Notes</dt>
 			<dd><textarea name="admin_notes" style="height: 200px;"></textarea></dd>
-
+<?php
+			/*
 			<button rel="<?=$appId?>" class="regmgr-submit-note">Add</button>
+			*/
+?>
+			<input rel="<?=$appId?>" class="regmgr-submit-note" type="button" value="Add Note" />
 		</dl>
 
 		<script type="text/javascript" src="/res/regmgr_notes/js/regmgr_notes.js"></script>
