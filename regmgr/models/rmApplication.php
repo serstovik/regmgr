@@ -117,9 +117,19 @@ class rmApplication extends vDBObject {
 	
 	function getList ($options = []) {
 
+		// Loading items from DB
 		$sql	= "SELECT * FROM {$this->Table}";
+		$res	= mwDB()->query($sql)->asArray('id'); 
 
-		return mwDB()->query($sql)->asArray('id');
+		// Post processing
+		foreach ( $res as $id => &$row ) {
+			
+			// Unpacking extensions info
+			$row['extensions'] = safeUnserialize($row['extensions']);
+			
+		} //FOR each
+
+		return $res;
 
 	} //FUNC getList
 
