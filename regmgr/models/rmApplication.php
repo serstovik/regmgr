@@ -37,6 +37,8 @@ class rmApplication extends vDBObject {
 	public	$modified		= '';				// |
 	public	$created		= '';				// |- Creation and last modification dates.
 
+	public	$userId			= '';				// Application owner.
+
 	public	$statusMajor		= 'new';			// |- Major and minor application statuses.
 	public	$statusMinor		= '';				// |
 
@@ -54,6 +56,8 @@ class rmApplication extends vDBObject {
 
 			->setField('modified')->Validations('')->DB(true, VDBO_DB_READ)->dbType('timestamp', false, true, true)
 			->setField('created')->Validations('')->DB(true, VDBO_DB_READ)->dbType('timestamp', false, 'CURRENT_TIMESTAMP', false)
+
+			->setField('userId', 'user_id')->Validations('isID')
 
 			->setField('statusMajor', 'status_major')->Validations('isAlnum')
 			->setField('statusMinor', 'status_minor')->Validations('isAlnum')
@@ -113,28 +117,21 @@ class rmApplication extends vDBObject {
 	
 	function getList ($options = []) {
 
+		// Loading items from DB
 		$sql	= "SELECT * FROM {$this->Table}";
+		$res	= mwDB()->query($sql)->asArray('id'); 
 
-		return mwDB()->query($sql)->asArray('id');
+		// Post processing
+		foreach ( $res as $id => &$row ) {
+			
+			// Unpacking extensions info
+			$row['extensions'] = safeUnserialize($row['extensions']);
+			
+		} //FOR each
+
+		return $res;
 
 	} //FUNC getList
-
-/* ==== Helpers ============================================================================================================= */
-
-	/** //** ----= loadByName	=------------------------------------------------------------------------------\**//** \
-	 *
-	 * 	Loads page by alias name.
-	 *
-	 * 	@param	string	$name	- Page alias name. Usually received from URI.
-	 *
-	 *	@return SELF
-	 *
-	\**//** ----------------------------------------------------------------= by SerStoVik @ Morad Media Inc. =----/** //**/
-	function loadByName1 ($name) {
-		return $this->loadByField('name', $name);
-	} //FUNC loadByName
-
-
 
 } //CLASS rmApplication
 

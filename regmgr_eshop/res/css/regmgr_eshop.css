@@ -1,0 +1,58 @@
+<?php
+	$margin			= 10;
+
+?>
+
+.eShop-productsList
+{
+	clear			: both;
+	overflow		: auto;
+}
+
+.eShop-productsList .eShop-item
+{
+	margin			: <?=$margin?>px 0px;
+}
+
+.eShop-productsList .eShop-item:first-child
+{
+/*	margin-top		: 0px; */
+}
+
+.eShop-productsList .eShop-item:after
+{
+	content			: '';
+	display			: block;
+	clear			: both;
+}
+
+.eShop-productsList .preview
+{
+	float			: left;
+	margin-right		: <?=$margin?>px;
+}
+
+.eShop-productsList .details
+{
+	float			: none;
+	overflow		: hidden;
+}
+
+.eShop-productsList .details>table
+{
+	width			: 100%;
+	border-spacing		: 0px;
+}
+
+.eShop-productsList .details>table th
+{
+	width			: 100px;
+	padding-right		: <?=$margin?>px;
+	text-align		: right;
+}
+
+.eShop-productsList .details>table td
+{
+	text-align		: left;
+
+}

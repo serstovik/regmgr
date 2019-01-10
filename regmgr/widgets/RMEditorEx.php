@@ -15,9 +15,15 @@ class mwRMEditorEx extends mwWidget {
 	public	$application	= false;	// Current application.
 	public	$data		= [];		// Extension data.
 
-	public	$tabs		= [];		// Tabs list.
-
 	function editor () {
 	} //FUNC editor
+
+	function validate ($data) {
+		return $data;
+	} //FUNC validate
+
+	function save ($data) {
+		return $data;
+	} //FUNC save
 
 } //CLASS mwRMEditorEx

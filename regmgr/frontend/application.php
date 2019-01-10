@@ -160,6 +160,11 @@ class mwApplication extends mwController {
 
 		$Attacher->uploadAndSaveDocument();
 
+	// ---- User ----
+	
+		// Setting up current user
+		$app->userId	= User::ID();
+
 	// ---- DB ----
 
 		// Making sure table is up to date
@@ -171,7 +176,7 @@ class mwApplication extends mwController {
 			//change status to submit only for new or saved apps
 			if ( in_array($this->statusMajor, [RM_STATUS_NEW, RM_STATUS_OPEN]) ) {
 			
-				$app->setStatus(RM_STATUS_SUBMIT);
+		//		$app->setStatus(RM_STATUS_SUBMIT);
 			
 			}//change status to submit
 
@@ -179,7 +184,7 @@ class mwApplication extends mwController {
 		//submit != 1 - save and return clicked
 		else {
 			
-			
+		//	$app->setStatus(RM_STATUS_OPEN);
 			
 		}
 		//__($_POST, $app);
@@ -226,15 +231,8 @@ class mwApplication extends mwController {
 
 	function test () {
 
-		$wgts	= $this->load->widgets('RMApplicationEx');
-		//__($wgts);
-
-
-
-		$wgt = $this->load->widget('RMApplicationEx', 'eShopForms');
-		__($wgt);
+		(new mwEvent('regmgr.status.new'))->trigger([]);
 
 	} //FUNC test
-
 
 }//CLASS mwApplication
