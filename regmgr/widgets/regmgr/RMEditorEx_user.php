@@ -34,9 +34,16 @@ class mwRMEditorEx_user extends mwRMEditorEx {
 		$form		= reset($user->Forms);
 		
 		// Outputting form, wrapping it into mwDialog
+		if ( !empty($form) ) {
 	?>
 		<div class="winContainer mwDialog"><?=$form->HTML()?></div>
 	<?php
+		}
+		else {
+	?>
+		<div class="winContainer mwDialog">No user form found.</div>
+	<?php
+		}
 		
 	} //FUNC editor_contact
 
