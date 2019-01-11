@@ -12,7 +12,6 @@
 class tplApplication extends vTpl2 {
 
 	public	$backend		= false;			// Backend editor rendering flag.
-//	public	$cart			= false;			// If cart is used - it will be loaded in here.
 
 	public	$SectionName		= '';				// Section name.
 	public	$load			= false;			// Section loader.
@@ -453,6 +452,32 @@ class tplApplication extends vTpl2 {
 		return $this->renderAction_save($node);
 
 	} //FUNC renderAction_submit
+
+	/** //** ----= nextTab, prevTab	=------------------------------------------------------------------------------\**//** \
+	*
+	*	Basic action. Generates buttons for tabs navigation.
+	*
+	\**//** ----------------------------------------------------------------= by SerStoVik @ Morad Media Inc. =----/** //**/
+	function renderAction_switchTab ($node, $prev = false) {
+
+		if ( $this->backend )
+			return false;
+
+		// ToDo: complete JS object for tabs naviagation control
+
+	} //FUNC renderAction_switchTab
+
+	function renderAction_nextTab ($node) {
+
+		return $this->renderAction_switchTab($node, false);
+
+	} //FUNC renderAction_nextTab
+
+	function renderAction_prevTab ($node) {
+
+		return $this->renderAction_switchTab($node, true);
+
+	} //FUNC renderAction_prevTab
 
 /* ==== Helpers ============================================================================================================= */
 	
