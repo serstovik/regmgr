@@ -16,6 +16,10 @@ class mwRmNotes extends mwController {
 
  		$appId	= $_POST['appId'];
  		$text	= $_POST['text'];
+ 		
+ 		if(empty($text))
+ 			return false;
+ 		
  		$userId		= User::ID();
 
  		$this->load()->model('rmnotes');
