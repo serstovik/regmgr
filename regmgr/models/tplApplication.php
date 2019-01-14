@@ -12,7 +12,6 @@
 class tplApplication extends vTpl2 {
 
 	public	$backend		= false;			// Backend editor rendering flag.
-//	public	$cart			= false;			// If cart is used - it will be loaded in here.
 
 	public	$SectionName		= '';				// Section name.
 	public	$load			= false;			// Section loader.
@@ -37,9 +36,7 @@ class tplApplication extends vTpl2 {
 	
 		// Splitting big parsers to dedicated parse/render methods for code readability
 		$this->parseTabs($this);
-	//	$this->parseForms($this);
 		$this->parseExtensions($this);
-	//	$this->parseDetails($this);
 		$this->parseTables($this);
 		$this->parseScripts($this);
 
@@ -68,237 +65,22 @@ class tplApplication extends vTpl2 {
 	*
 	\**//** ----------------------------------------------------------------= by SerStoVik @ Morad Media Inc. =----/** //**/
 	function parseTabs ($node) {
-
-		$node->parse()->section('tabs', function ($node) {
-
-			// Loading CI's reflector helper
-			CI()->load->helper('inflector');
-
-			// Parsing all tab contents and collecting headers/bodies as array
-			// After parse - rendering tabs using appropiate renderer
-			$tabs		= [];
-			
-			// Marking selected tab
-			$selected	= false;
-					
-			// Using counter to autoname tabs names
-			$i	= 1;
-			
-			$node->parse()->section('tabContent', function ($node) use (&$tabs, &$i, &$selected) {
-
-			// ---- Head ----
-				
-				// Reading head
-				$name	= '';
-				$cap	= '';
-				
-				// Checking available attributes and generating name for tab
-				if ( $node->attr['name'] )
-					
-					// If name specified - just using it
-					$name = $node->attr['name'];
-					
-				elseif ( $node->attr['caption'] )
-					
-					// If no name, but caption - creating name from name
-					$name = underscore($node->attr['caption']);
-				
-				else
-					
-					// Finally - have to use counter
-					$name = 'tab_'.$i;
-				
-				// Similar logic for caption, except this time we have name
-				if ( $node->attr['caption'] )
-				
-					// If have caption - using it
-					$cap = $node->attr['caption'];
-				else
-					
-					// Otherwise - just using name
-					$cap = humanize($name);
-			
-				// Saving it
-				$tabs[$name] = [
-					'name'		=> $name,
-					'caption'	=> $cap,
-					'selected'	=> false,
-				]; //$tabs
-			
-				// Checking if tab is marked for selection
-				
-				if ( !empty( $node->attr['selected'] ) )
-					$selected	= $name;
-			
-			// ---- Body ----
-			
-				// Saving node body in collection 
-				$tabs[$name]['body']	= $node->html();
-				
-				// Increasing couner
-				$i++;	
-				
-			}); //FUNC parse tabContent
-			
-			// Selecting some tab
-			if ( !$selected )
-				$selected = reset($tabs)['name'];
-			
-			// Adding selected marker
-			$tabs[$selected]['selected'] = true;
-				
-			// Rendering tabs using selected renderer
-			// ToDo: implement more rendering methods for frontend and give designers ability to choose
-			if ( $this->backend )
-				return $this->_ob_renderTabs_backend($node, $tabs);
-			else
-				return $this->_ob_renderTabs_radios($node, $tabs);
-				
-		}); //FUNC parse tabs
 		
-		return $this;
+		// Using dedicaated tabs model for tabs parsing
+		$tabsTpl		= $this->load->model('tplRMTabs', true);
+		
+		// Setting params
+		$tabsTpl
+			->html( $node->html() )		// Giving it self html		
+			->backend( $this->backend )	// Specifying if rendering for backned
+			->load( $this->load )		// Providing loader
+			->main()			// Parsing
+		; //$tabsTpl
+
+		// Geting result back
+		$node->html( $tabsTpl->html() );
 		
 	} //FUNC parseTabs
-
-	/** //** ----= renderTabs_radios	=----------------------------------------------------------------------\**//** \
-	*
-	* 	Rendering tabs using radios css trick.
-	*
-	* 	@see vTplNode parser for params.
-	*
-	*	@return	SELF
-	*
-	\**//** ----------------------------------------------------------------= by SerStoVik @ Morad Media Inc. =----/** //**/
-	function renderTabs_radios ($node, $tabs) {
-
-		$this->load->js('rmTabs.js');
-
-		// Generating jsSn
-		$jsSn		= ( !empty($node->attr['id']) and isVar($node->attr['id']) )? $node->attr['id'] : newSN('T');
-
-		// Reading options data
-		$jsOptions	= ( !empty($node->attr['options']) )? $node->attr['options'] : '{}';
-
-		// Reading initial height
-		// It will be updated with JS anyway, but looks better when it's locked initially
-		$height		= ( $node->attr['height'] ) ? $node->attr['height'] : 300;
-	?>
-		<div class="rmTabs" id="<?=$jsSn?>" style="margin-bottom: <?=$height?>px;">
-
-		<?php	foreach ( $tabs as $name => $row ) { ?>
-		
-				<input type="radio" name="<?=$jsSn?>_tab" id="<?=$name?>" class="mw" <?=($row['selected']) ? ' checked="checked"' : ''?> />
-				<label for="<?=$name?>" class="rmTabs-head"><?=$row['caption']?></label>
-				<div class="rmTabs-content" data-for="<?=$name?>"><?=$row['body']?></div>
-
-		<?php	} //FOR each tab ?>	
-
-		</div>
-
-		<hr />
-
-		<script type="text/javascript">
-		
-			jQuery( function () {
-
-				rmTabs('#<?=$jsSn?>', <?=$jsOptions?>);
-
-				// Giving it small timeout to allow styleDialog to apply
-				setTimeout( function () {
-
-					// Getting tabs wrapper to work with
-					var $wrap	= jQuery('#<?=$jsSn?>');
-					
-				<?php	if ( empty($node->attr['data-dynaheight']) ) { ?>					
-
-						// Fast detecting max height on tabs, and applying margin to wrapper
-						// Looping through contents and calculating heights
-						var $height	= 0;
-						$wrap.children('.rmTabs-content').each( function () {
-							
-							var $el	= jQuery(this);
-							
-							// Calculating height and coparing with biggest found
-							var $h	= $el.outerHeight(true);
-							if ( $h > $height )	
-								$height = $h
-							
-						}); //FOR each children
-						
-						// Now we have biggest height, can force margin
-						$wrap.css('margin-bottom', $height);
-
-				<?php	} else { ?>					
-					
-						// Updating wrapper height on tab clicks
-						$wrap.children('.rmTabs-head').on('click', function () {
-							
-							var $el		= jQuery(this);
-	
-							// Calculating height						
-							var $height	= $el.next().outerHeight(true);
-							$wrap.css('margin-bottom', $height);
-							
-						}); //FUNC onClick
-						
-						// Setting currently checked element height
-						var $height = $wrap
-							.children('input[type=radio]:checked').next().next()
-							.outerHeight(true);
-	
-						$wrap.css('margin-bottom', $height);
-	
-				<?php	} //IF dynamic height?>					
-				}, 10);
-					
-			}); //jQuery.onLoad
-		
-		</script>
-	<?php
-	} //FUNC renderTabs_radios
-
-	/** //** ----= renderTabs_backend	=----------------------------------------------------------------------\**//** \
-	*
-	* 	Rendering tabs for backend editor.
-	*
-	* 	@see vTplNode parser for params.
-	*
-	*	@return	SELF
-	*
-	\**//** ----------------------------------------------------------------= by SerStoVik @ Morad Media Inc. =----/** //**/
-	function renderTabs_backend ($node, $tabs) {
-	?>
-		<dl class="mwDialog tools rmTabs-backend">
-
-			<dd>
-				<table class="mwWinTabs">
-					<tr>
-
-					<?php	foreach ( $tabs as $name => $row ) { ?>
-
-							<td rel="<?=$name?>" onclick="mwSwitchTab(this);"<?=($row['selected']) ? ' class="Selected"' : ''?>><?=$row['caption']?></td>
-
-					<?php	} //FOR each tab ?>	
-
-					</tr>
-				</table>
-			</dd>
-
-		</dl>
-	
-	<?php	$i = 0; ?>
-	
-		<div class="winContainer">	
-
-		<?php	foreach ( $tabs as $name => $row ) { ?>
-		
-				<div class="winContainer" id="<?=$name?>"<?=($row['selected']) ? '' : ' style="display:none"'?>><?=$row['body']?></div>
-		
-		<?php	} //FOR each tab ?>	
-
-		</div>
-	<?php
-	} //FUNC renderTabs_backend
 
 /* ==== Backend ============================================================================================================= */
 

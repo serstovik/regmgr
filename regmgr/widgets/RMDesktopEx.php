@@ -38,8 +38,10 @@ class mwRMDesktopEx extends mwWidget
 		
 		$options = array_merge($def, $options);
 		
-		//$html = arrayToTemplate($row, $template);
-		$html = arrayToTemplate($row, $template);
+		// Parsing with tpl for nested arrays support
+		$html	= (new vTpl2($template))->parse()->vars($row)->html();
+		
+	//	$html = arrayToTemplate($row, $template);
 		
 		return $html;
 		

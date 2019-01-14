@@ -26,12 +26,13 @@ class mwSystemEvent_regmgrMailer extends mwSystemEvent {
 	\**//** -------------------------------------------------------------------= by Mr.V!T @ Morad Media Inc. =----/** //**/
 	function trigger ($event, $data) {
 		
-		//__($event, $data);
-		
-		$data = $data->asArray();
+		__($event, $data);
+		//__($data);
 		
 		//check is this status event
-		if ( !empty($event->descriptor[1]) and $event->descriptor[1] == 'status' ) {
+		if ( !empty($event->descriptor[1]) and $event->descriptor[1] == 'status' and is_object($data) ) {
+			
+			$data = $data->asArray();
 			
 			if ( !empty($event->descriptor[2]) ) {
 				
@@ -40,18 +41,28 @@ class mwSystemEvent_regmgrMailer extends mwSystemEvent {
 				
 				foreach( $cfg as $k => $v ) {
 					
-					$to = $v['to'];
-					$from = $v['from'];
+					$user = $this->getUsers($data['user_id']);
+					$adminEmail = mwCfg('System/AdminEmail');
+					
+					$to = str_replace('@user', $user['email'], $v['to']);
+					$to = str_replace('@admin', $adminEmail, $to);
+					
+					$from = str_replace('@user', $user['email'], $v['from']);
+					$from = str_replace('@admin', $adminEmail, $from);
+					
 					$subject = arrayToTemplate($data, $v['subject']);
 					
-					$user = $this->getUsers($data['userId']);
 					//__($user);
 					if ( is_array($user) )
 						$data = array_merge($user, $data);
 					//__($data);
 					$file = compilePath(SITE_TEMPLATES_PATH, 'regmgr/emails', $v['template']);
-					$body = loadView($file, $data);
-					//__($to, $from, $body, $subject);
+					//$body = loadView($file, $data);
+					$body = loadView($file, []);
+					
+					$body = (new vTpl2($body))->parse()->vars($data)->html();
+					
+					__($to, $from, $body, $subject);
 					$this->email($to, $from, $body, $subject);
 					
 				}
@@ -88,7 +99,7 @@ class mwSystemEvent_regmgrMailer extends mwSystemEvent {
 			  *
 			FROM users
 			' . $where . '
-		')->asArray('id');
+		')->asRow();
 		
 	} //METHOD getUsers
 	

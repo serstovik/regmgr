@@ -1,0 +1,90 @@
+/* ==== Mechanics ==== */
+
+.rmTabs 
+{
+	overflow		: hidden;	
+}
+
+
+.rmTabs-container 
+{
+	position		: relative;
+}
+
+div.rmTabs+hr
+{
+	width			: 100%;
+	height			: 1px;
+	margin			: 0px;
+	border			: none;
+	background		: none;
+	opacity			: 0;
+} 
+
+.rmTabs-container:after 
+{
+	content			: '';
+	display			: block;
+	clear			: both;
+}
+
+.rmTabs-container>input[type=radio]
+{
+	display			: none;
+}
+
+.rmTabs-container>label
+{
+	display			: block;
+	float			: left;
+}
+
+.rmTabs-container>label+div
+{
+	position		: absolute;
+	top			: 100%;
+	width			: 100%;
+	
+	opacity			: 0;
+	
+	pointer-events		: none;
+}
+
+.rmTabs-container>input:checked+label+div 
+{
+	opacity			: 1;
+	pointer-events		: auto;
+}
+
+/* ==== Looks ==== */
+
+.rmTabs-container,
+.rmTabs-container>*
+{
+	box-sizing		: border-box;
+}
+
+.rmTabs .rmTabs-container
+{
+	transition		: margin-bottom 400ms !important;
+}
+
+.rmTabs .rmTabs-button
+{
+	padding			: 10px;
+	background		: #EEEEEE; 
+	cursor			: pointer;
+	transition		: background 400ms;
+}
+
+.rmTabs .rmTabs-content
+{
+	border-top		: 1px solid gray;
+	padding			: 10px;
+	transition		: opacity 400ms;
+}
+
+.rmTabs .rmTabs-button.selected 
+{
+	background		: silver; 
+}

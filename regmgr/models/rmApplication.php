@@ -116,6 +116,8 @@ class rmApplication extends vDBObject {
 	} //FUNC init
 	
 	function getList ($options = []) {
+	
+	// ---- Filter ----
 		
 		$where = '';
 		
@@ -128,19 +130,48 @@ class rmApplication extends vDBObject {
 			
 			$where .= 'type = \'' . $options['type'] . '\'';
 				
-		}
+		} //IF type is set
+	
+	// ---- Applications ----	
 		
 		// Loading items from DB
 		$sql	= "SELECT * FROM {$this->Table}" . $where;
 		$res	= mwDB()->query($sql)->asArray('id'); 
 
 		// Post processing
+		$users	= [];
 		foreach ( $res as $id => &$row ) {
 			
 			// Unpacking extensions info
 			$row['extensions'] = safeUnserialize($row['extensions']);
 			
-		} //FOR each
+			// Collecting user IDs, to load users
+			$users[]	= $row['user_id'];
+			
+		} //FOR each row
+
+	// ---- Users ----	
+
+		// Loading users data
+		$uTable	= User::get()->Table;
+		$sql	= "
+			SELECT * FROM `{$uTable}`
+			WHERE `id` in (".sqlValues($users).")
+		";
+
+		$users	= mwDB()->query($sql)->asArray('id');
+
+		// Storing user data in each application row
+		foreach ( $res as $id => &$row ) {
+			
+			// Skipping problematic ones
+			if ( empty($row['user_id']) or empty($users[$row['user_id']]) )
+				continue;
+				
+			// Storing user as subarray
+			$row['user']	= $users[$row['user_id']];
+			
+		} //FOR each row
 
 		return $res;
 
