@@ -26,13 +26,13 @@ class mwSystemEvent_regmgrMailer extends mwSystemEvent {
 	\**//** -------------------------------------------------------------------= by Mr.V!T @ Morad Media Inc. =----/** //**/
 	function trigger ($event, $data) {
 		
-		//__($event, $data);
-		
-		$data = $data->asArray();
+		__($event, $data);
 		//__($data);
 		
 		//check is this status event
-		if ( !empty($event->descriptor[1]) and $event->descriptor[1] == 'status' ) {
+		if ( !empty($event->descriptor[1]) and $event->descriptor[1] == 'status' and is_object($data) ) {
+			
+			$data = $data->asArray();
 			
 			if ( !empty($event->descriptor[2]) ) {
 				
@@ -57,8 +57,12 @@ class mwSystemEvent_regmgrMailer extends mwSystemEvent {
 						$data = array_merge($user, $data);
 					//__($data);
 					$file = compilePath(SITE_TEMPLATES_PATH, 'regmgr/emails', $v['template']);
-					$body = loadView($file, $data);
-					//__($to, $from, $body, $subject);
+					//$body = loadView($file, $data);
+					$body = loadView($file, []);
+					
+					$body = (new vTpl2($body))->parse()->vars($data)->html();
+					
+					__($to, $from, $body, $subject);
 					$this->email($to, $from, $body, $subject);
 					
 				}

@@ -172,9 +172,9 @@ class mwApplication extends mwController {
 		
 		//check is submit button was clicked
 		if ( !empty($_POST['submit']) && $_POST['submit'] == '1' ) {
-
+			
 			//change status to submit only for new or saved apps
-			if ( in_array($this->statusMajor, [RM_STATUS_NEW, RM_STATUS_OPEN]) ) {
+			if ( empty($this->statusMajor) or in_array($this->statusMajor, [RM_STATUS_NEW, RM_STATUS_OPEN]) ) {
 			
 				$app->statusMajor = RM_STATUS_SUBMIT;
 
@@ -187,7 +187,7 @@ class mwApplication extends mwController {
 			$app->statusMajor = RM_STATUS_OPEN;
 			
 		}
-		//__($_POST, $app);
+		
 		//$app->loadById();
 		
 		
@@ -198,7 +198,7 @@ class mwApplication extends mwController {
 		
 		//triger after save
 	//	$this->addAjax('resultMessage', $msg);
-		
+	//	__($app);
 		(new mwEvent('regmgr.status.' . $app->statusMajor))->trigger($app);
 		
 	} //FUNC save
@@ -230,11 +230,13 @@ class mwApplication extends mwController {
 		return $this;
 
 	} //FUNC initWidget
-
+	
+	/*
 	function test () {
 
 		(new mwEvent('regmgr.status.new'))->trigger([]);
 
 	} //FUNC test
-
+	*/
+	
 }//CLASS mwApplication
