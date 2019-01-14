@@ -14,25 +14,27 @@
 	]; //$tabs
 
 
-	 function editor_notes ($appId = '') {
-
-	 	$this->load->model('rmnotes');
+	function editor_notes ($appId = '') {
+		
+		$this->load->model('rmnotes');
 	 	$RMNotes	= new rmNotes();
 	 	$RMNotes->createTable()->updateTable();
 
 	 	if (empty($appId))
 			$appId	= $this->application->id;
 		
-		$notes	= $this->getNotes($appId);
-		//__($notes);
+		$notes		= $RMNotes->getNotesByAppId($appId);
 		if ($notes && is_array($notes)){
-
+			
+			$notes		= $this->addUsersToNotes($notes);
+			
 			$notesHtml	= '<section id="rmnotes_list">';
 
 			foreach ($notes as $note){
 
 				$notesHtml	.= "<dl  class='mwDialog' id='".$note['id']."'>";
 
+				$notesHtml	.= '<dt class="rmnotes-user-data"><strong>User: </strong>'.$note['user_data']['email'].'</dt>';
 				$notesHtml	.= '<dt class="rmnotes-date"><strong>Date: </strong>'.$note['modified'].'</dt>';
 				$notesHtml	.= '<dt class="rmnotes-text"><strong>Note: </strong>'.$note['text'].'</dt>';
 				$notesHtml	.= '<br/>';
@@ -60,7 +62,7 @@
 		<dl class="mwDialog">
 
 			<dt>Admin Notes</dt>
-			<dd><textarea name="admin_notes" style="height: 200px;"></textarea></dd>
+			<dd><textarea name="admin_notes" style="height: 200px;" value=""></textarea></dd>
 <?php
 			/*
 			<button rel="<?=$appId?>" class="regmgr-submit-note">Add</button>
@@ -80,18 +82,27 @@
 	<?php
 
 	} //FUNC editor_notes
-
-	function getNotes($appId){
-
-	 	mwLoad('regmgr_notes')->model('rmnotes');
-	 	$RMNotes	= new rmNotes();
-	 	
-	 	$notes		= $RMNotes->getNotesByAppId($appId);
-	 	
-	 	if (!empty($notes))
-	 		return $notes;
-
-	 	return false;
-	} //FUNC getNotes
-
+	
+	function addUsersToNotes($notes = array()){
+		
+		//getting all existing users
+		$sql	= 'SELECT id, login, email FROM `users`';
+		$usersData	= mwDB()->query($sql)->asArray();
+		
+		foreach($notes as $k => $note){
+			foreach($usersData as $user){
+				if($note['user_id'] == $user['id']){
+					$notes[$k]['user_data']	= $user;
+					break;
+				}
+				else {
+					$notes[$k]['user_data']	= null;
+				}//if
+			}//foreach
+		}//foreach
+		
+		return $notes;		
+		
+	}//func addUsersToNotes
+	 
 } //CLASS mwRMEditorEx_notes

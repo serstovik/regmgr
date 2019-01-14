@@ -13,7 +13,6 @@
 
 	public	$Table			= 'regmgr_notes'; 	// DB table to use.
 
-
 // ---- FIELDS ----
 
 	public	$id			= 0;				// DB id.
@@ -45,14 +44,19 @@
 	} //FUNC saveNote
 
 	function getNotesByAppId($appId){
+ 		
  		$sql	= "SELECT * FROM {$this->Table} WHERE `app_id` = {$appId}";
- 		return mwDB()->query($sql)->asArray();
+ 		$notes	= mwDB()->query($sql)->asArray();
+ 		//adding users to the notes
+ 		return $this->addUsersToNotes($notes);
+ 		
 	} //FUNC getNotesById
 
 	//return singe note
 	function getNoteById($noteId){
-		$sql	= "SELECT * FROM {$this->Table} WHERE `id` = {$noteId}";
-		return mwDB()->query($sql)->asRow();
+		$sql		= "SELECT * FROM {$this->Table} WHERE `id` = {$noteId}";
+		$noteData	= mwDB()->query($sql)->asRow();
+		return $this->addUsersToNotes($noteData, false);
 	} //FUNC getNoteById
 
 	function updateNoteById($noteId, $newText){
@@ -64,6 +68,41 @@
 		$sql	= "DELETE FROM {$this->Table} WHERE `id` = {$noteId}";
 		mwDB()->query($sql);
 	} //FUNC removeNote
-
+	 
+	function addUsersToNotes($notes = array(), $isList = true){
+		
+		//getting all existing users
+		$sql	= 'SELECT id, login, email FROM `users`';
+		$usersData	= mwDB()->query($sql)->asArray();
+		if($isList){
+			
+			foreach($notes as $k => $note){
+				foreach($usersData as $user){
+					if($note['user_id'] == $user['id']){
+						$notes[$k]['user_data']	= $user;
+						break;
+					}
+					else {
+						$notes[$k]['user_data']	= null;
+					}//if
+				}//foreach
+			}//foreach
+			
+		}
+		else {
+			foreach($usersData as $user){
+				if($notes['user_id'] == $user['id']){
+					$notes['user_data']	= $user;
+					break;
+				}
+				else {
+					$notes['user_data']	= null;
+				}//if
+			}//foreach
+		}//if
+		
+		return $notes;		
+		
+	}//func addUsersToNotes	
 
  } //CLASS rmNotes
