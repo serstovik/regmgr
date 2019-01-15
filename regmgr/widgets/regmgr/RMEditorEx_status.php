@@ -56,8 +56,8 @@ class mwRMEditorEx_status extends mwRMEditorEx
 			<table class="mwDialog tall">
 				<tr><th>Current Status: <span id="regmgr_approve_text"></span></th></tr>
 				<tr><td>
-					<input hint="Approve application" class="Hi full" type="button" value="Approve" onClick="regmgr_update_approve('approved')" />
-					<input hint="Decline application" class="Red full" type="button" value="Decline" onClick="regmgr_update_approve('declined');"/>
+					<input hint="Approve application" class="Hi full cell-60" type="button" value="Approve" onClick="regmgr_update_approve('approved')" />
+					<input hint="Decline application" class="Red full cell-40" type="button" value="Decline" onClick="regmgr_update_approve('declined');"/>
 					<!--input id="regmgr_approval_value" type="hidden" name="approval_value" /-->
 				</td></tr>
 				

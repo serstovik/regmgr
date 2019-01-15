@@ -151,28 +151,33 @@ class rmApplication extends vDBObject {
 		} //FOR each row
 
 	// ---- Users ----	
-
-		// Loading users data
-		$uTable	= User::get()->Table;
-		$sql	= "
-			SELECT * FROM `{$uTable}`
-			WHERE `id` in (".sqlValues($users).")
-		";
-
-		$users	= mwDB()->query($sql)->asArray('id');
-
-		// Storing user data in each application row
-		foreach ( $res as $id => &$row ) {
+		
+		//check is users exists
+		if ( !empty($users) ) {
 			
-			// Skipping problematic ones
-			if ( empty($row['user_id']) or empty($users[$row['user_id']]) )
-				continue;
+			// Loading users data
+			$uTable	= User::get()->Table;
+			$sql	= "
+				SELECT * FROM `{$uTable}`
+				WHERE `id` in (".sqlValues($users).")
+			";
+
+			$users	= mwDB()->query($sql)->asArray('id');
+
+			// Storing user data in each application row
+			foreach ( $res as $id => &$row ) {
 				
-			// Storing user as subarray
-			$row['user']	= $users[$row['user_id']];
+				// Skipping problematic ones
+				if ( empty($row['user_id']) or empty($users[$row['user_id']]) )
+					continue;
+					
+				// Storing user as subarray
+				$row['user']	= $users[$row['user_id']];
+				
+			} //FOR each row
 			
-		} //FOR each row
-
+		}
+		
 		return $res;
 
 	} //FUNC getList

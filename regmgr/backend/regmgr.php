@@ -39,8 +39,31 @@ class mwRegmgr extends mwController
 			return;
 
 		$this->load->editor('applicationEd')->loadJS();
-
-		return $this->loadIndex('desktop');
+		
+		$section = 'Register Manager';
+		
+		//check section name for global editor
+		if ( !$type ) {
+			
+			$section = rmCfg()->get('section', $section);
+			
+		}
+		//check section name for current type
+		else {
+			
+			//get section title for current type
+			$tmpSection = rmCfg()->getBranch('types', $type, 'section');
+			
+			//check is it not empty
+			if ( !empty($tmpSection) )
+				$section = $tmpSection;
+			
+		}
+		
+		return $this->loadIndex('desktop', array(
+			'section'	=> $section,
+			'barContent'	=> $this->_getBarHtml(),
+		));
 
 	} //FUNC index
 	
@@ -152,6 +175,48 @@ class mwRegmgr extends mwController
 		
 	} //FUNC _renderIndex
 	
+	function _getBarHtml() {
+		
+		$sortingCFG = rmCfg()->getBranch('core', 'sorting');
+		
+		//__($sortingCFG);
+		
+		$html = '';
+		
+		if ( !empty($sortingCFG) ) {
+			
+			foreach($sortingCFG as $sortField => $sortVal) {
+				
+				if ( !empty($sortVal['text']) )
+					$text = $sortVal['text'];
+				else
+					$text = 'Order By ' . $sortField;
+				
+				if ( !empty($sortVal['asc']) )
+					$asc = $sortVal['asc'];
+				else
+					$asc = 'Order By ' . $sortField . ' ASC';
+				
+				if ( !empty($sortVal['desc']) )
+					$desc = $sortVal['desc'];
+				else
+					$desc = 'Order By ' . $sortField . ' DESC';
+				
+				$html .= '<select data-order="' . $order . '" id="sorting_' . $sortField . '">';
+				$html .= '<option value="">' . $text . '</option>';
+				$html .= '<option value="asc">' . $asc . '</option>';
+				$html .= '<option value="desc">' . $desc . '</option>';
+				
+				$html .= '</select>';
+				
+			}
+			
+		}
+		
+		return $html;
+		
+	} //FUNC _getBarHtml
+	
 /* ==== Helpers ============================================================================================================= */
 
 	function _getHeaders (){
@@ -193,6 +258,15 @@ class mwRegmgr extends mwController
 		return $Arr;
 
 	} //FUNC getApplications
+	
+	function _getDescValues($field) {
+		
+		$sql	= '
+			SELECT DISTINCT ' . $field . ' FROM regmgr_applications
+		';
 
-
+		return mwDB()->query($sql)->asArray();
+		
+	}
+	
 }//CLASS mwRegmgr
