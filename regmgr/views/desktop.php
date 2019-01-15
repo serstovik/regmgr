@@ -1,5 +1,9 @@
 <div class="mwDskTools">
-	<h1>Register Manager</h1>
+	<h1><?=$section?></h1>
+	<?=$barContent?>
+	
+	<!--
+	
 	<select id="order_select">
 		<option value="default_desc">Order By</option>
 		<option value="alpha_desc">Alphanumeric Desc</option>
@@ -14,7 +18,9 @@
 	</select>
 
 	<a class="Add" onclick="applicationEd.dialog()" >Test Application</a>
-
+	
+	-->
+	
 </div>
 <div class="mwDesktop">
 	<?=$table;?>

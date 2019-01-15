@@ -26,7 +26,7 @@ class mwSystemEvent_regmgrMailer extends mwSystemEvent {
 	\**//** -------------------------------------------------------------------= by Mr.V!T @ Morad Media Inc. =----/** //**/
 	function trigger ($event, $data) {
 		
-		__($event, $data);
+		//__($event, $data);
 		//__($data);
 		
 		//check is this status event
