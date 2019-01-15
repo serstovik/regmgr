@@ -21,17 +21,29 @@ class mwRegmgr extends mwController
 
 	function index ($type = '') {
 
-		$app		= new rmApplication();
+		$this->app = new rmApplication();
 		
 		// Ensuring applications DB meets minimum requirements
-		$app->createTable()->updateTable();
+		$this->app->createTable()->updateTable();
 		
-		$option = [];
-		if ( !empty($type) ) $option['type'] = $type;
-
-		$rows		= $app->getList($option);
+		//init regmgr session
+		if ( !isset($_SESSION['regmgr']) )
+			$_SESSION['regmgr'] = [];
 		
-		$tData		= [];
+		//init filters
+		if ( !isset($_SESSION['regmgr']['filters']) )
+			$_SESSION['regmgr']['filters'] = [];
+		
+		//todo: improve type to fix bugs in case you saving from non type page after there was save from type page
+		//type stored in session makes non type page index updates as last type saved
+		
+		//set filters type
+		if ( !$this->isAjax )
+			$_SESSION['regmgr']['filters']['type'] = $type;
+		//__($_SESSION['regmgr'], $type);
+		
+		$rows = $this->app->getList($_SESSION['regmgr']['filters']);
+		$tData = [];
 		
 		$this->_renderIndex($rows, $tData);
 		
@@ -43,7 +55,7 @@ class mwRegmgr extends mwController
 		$section = 'Register Manager';
 		
 		//check section name for global editor
-		if ( !$type ) {
+		if ( !$_SESSION['regmgr']['filters']['type'] ) {
 			
 			$section = rmCfg()->get('section', $section);
 			
@@ -52,7 +64,7 @@ class mwRegmgr extends mwController
 		else {
 			
 			//get section title for current type
-			$tmpSection = rmCfg()->getBranch('types', $type, 'section');
+			$tmpSection = rmCfg()->getBranch('types', $_SESSION['regmgr']['filters']['type'], 'section');
 			
 			//check is it not empty
 			if ( !empty($tmpSection) )
@@ -240,8 +252,7 @@ class mwRegmgr extends mwController
 
 	//prepare and  format application list for our index
 	function _getApplications (){
-
-
+		
 		//get list of  all apps
 		$applications	= $this->app->getFullList();
 		$headers	= $this->getHeaders();
@@ -258,15 +269,5 @@ class mwRegmgr extends mwController
 		return $Arr;
 
 	} //FUNC getApplications
-	
-	function _getDescValues($field) {
-		
-		$sql	= '
-			SELECT DISTINCT ' . $field . ' FROM regmgr_applications
-		';
-
-		return mwDB()->query($sql)->asArray();
-		
-	}
 	
 }//CLASS mwRegmgr
