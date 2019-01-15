@@ -28,7 +28,7 @@ class mwRegmgr extends mwController
 		
 		$option = [];
 		if ( !empty($type) ) $option['type'] = $type;
-		
+
 		$rows		= $app->getList($option);
 		
 		$tData		= [];
