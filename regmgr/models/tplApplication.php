@@ -122,7 +122,12 @@ class tplApplication extends vTpl2 {
 		if ( !$this->backend )
 			return;
 
+		// Cutting out random designers scripts
 		$node->parse()->section('script', function ($node) {
+
+			// Must keep extensions scripts
+			if ( !empty($node->attr['data-extension']) )
+				return $node;
 
 			return false;
 

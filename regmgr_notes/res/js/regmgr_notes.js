@@ -34,6 +34,9 @@ var rmNotes	=  (function () {
 
 					$this.dom.container 	= $this.dom.submitBtn.parents('dl');
 					$this.dom.textArea 	= $this.dom.container.find('textarea');
+					
+					//empty textArea value
+					$this.dom.textArea.val('');
 
 					var addClicks	= function() {
 
@@ -50,10 +53,10 @@ var rmNotes	=  (function () {
 							mwAjax(RM_BACKEND_NOTES_AJAX + '/addNote/', $params)
 
 								.success(function ($data) {
-
 									// var $newEl	= $this.dom.wrapper.find('dl').last('dl').clone();
 									//update element Data
 									var newEl = "<dl class='mwDialog' id='" + $data.content.id + "'>";
+									newEl += "<dt class='rmnotes-user-data'><strong>User: </strong>" + $data.content.user_data.email + "</dt>";
 									newEl += "<dt class='rmnotes-date'><strong>Date: </strong>" + $data.content.modified + "</dt>";
 									newEl += "<dt class='rmnotes-text'><strong>Note: </strong>" + $data.content.text + "</dt>";
 									newEl += "<br>";
