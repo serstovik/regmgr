@@ -48,17 +48,21 @@ class mwRMEditorEx_prStatus extends mwRMEditorEx_status
 		$statuses = array_merge([0 => 'Select Status'], $statuses);
 		//__($statuses);
 		
+		// Decoding items data
+		$cart = json_decode($this->application->extensions['eShop']['cart'], true);
+		//__($cart);
+		
 		?>
 		
 		<div id="postHistory" class="winContent">
 			<table class="mwDialog tall">
 				<tr><th>Current Application Status: <span id="regmgr_approve_text"></span></th></tr>
-				<?php if( !empty($this->application->extensions['eShop']['items']) ): ?>
+				<?php if( !empty($cart) ): ?>
 				<tr><th>
 					<select class="approve-products-list" name="product">
 						<option value="">Please Select Pet to Approve</option>
-						<?php foreach($this->application->extensions['eShop']['items'] as $k => $v): ?>
-						<option value="<?=$k?>"><?=$v['item_title']?></option>
+						<?php foreach($cart as $v): ?>
+						<option value="<?=$v['id']?>"><?=$v['item']['title']?></option>
 						<?php endforeach;?>
 					</select>
 				</th></tr>
