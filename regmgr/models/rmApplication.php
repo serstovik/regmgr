@@ -149,14 +149,15 @@ class rmApplication extends vDBObject {
 			$row['extensions'] = safeUnserialize($row['extensions']);
 			
 			// Collecting user IDs, to load users
-			$users[]	= $row['user_id'];
+			if ( $row['user_id'] )
+				$users[]	= $row['user_id'];
 			
 		} //FOR each row
 
 	// ---- Users ----	
 		
-		//check is users exists
-		if ( !empty($users) ) {
+		// Additionally checking users to make sure that there is what to search
+		if ( $users ) {
 			
 			// Loading users data
 			$uTable	= User::get()->Table;
@@ -179,7 +180,7 @@ class rmApplication extends vDBObject {
 				
 			} //FOR each row
 			
-		}
+		} //IF found users
 		
 		return $res;
 
