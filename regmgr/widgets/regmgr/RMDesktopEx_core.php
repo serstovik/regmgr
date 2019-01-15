@@ -13,8 +13,9 @@ class mwRMDesktopEx_core extends mwRMDesktopEx {
 		$minor	= $row['status_minor'];
 
 		// Getting captions
-		$mjCap	= $major ? rmCfg()->getStatuses($major) : $major;
-		$mnCap	= $minor ? rmCfg()->getStatuses($minor) : $minor;
+		// Correcting to defaults if no config found
+		$mjCap	= ( is_string($mjCap = rmCfg()->getStatuses($major)) ) ? $mjCap : $major; 
+		$mnCap	= ( is_string($mnCap = rmCfg()->getStatuses($minor)) ) ? $mnCap : $minor; 
 
 		// Returning based on config - both by default
 		if ( empty($cfg['type']) or $cfg['type'] == 'both' )

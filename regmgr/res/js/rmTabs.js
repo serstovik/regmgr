@@ -154,6 +154,14 @@ var rmTabs		= function ($el, $options) {
 
 			}); //FUNC onClick
 
+		// Updating tabs heights on resize
+		jQuery( window )
+			.on('resize.rmTabs', function ($e) {
+
+				$this.updateHeights();
+
+			}); //FUNC onResize
+
 	// ---- Current ----
 
 		// Looking for current item, to have correct information for children

@@ -138,6 +138,9 @@ class rmApplication extends vDBObject {
 		$sql	= "SELECT * FROM {$this->Table}" . $where;
 		$res	= mwDB()->query($sql)->asArray('id'); 
 
+		if ( !$res )
+			return $res;
+
 		// Post processing
 		$users	= [];
 		foreach ( $res as $id => &$row ) {
@@ -146,33 +149,39 @@ class rmApplication extends vDBObject {
 			$row['extensions'] = safeUnserialize($row['extensions']);
 			
 			// Collecting user IDs, to load users
-			$users[]	= $row['user_id'];
+			if ( $row['user_id'] )
+				$users[]	= $row['user_id'];
 			
 		} //FOR each row
 
 	// ---- Users ----	
-
-		// Loading users data
-		$uTable	= User::get()->Table;
-		$sql	= "
-			SELECT * FROM `{$uTable}`
-			WHERE `id` in (".sqlValues($users).")
-		";
-
-		$users	= mwDB()->query($sql)->asArray('id');
-
-		// Storing user data in each application row
-		foreach ( $res as $id => &$row ) {
+		
+		// Additionally checking users to make sure that there is what to search
+		if ( $users ) {
 			
-			// Skipping problematic ones
-			if ( empty($row['user_id']) or empty($users[$row['user_id']]) )
-				continue;
+			// Loading users data
+			$uTable	= User::get()->Table;
+			$sql	= "
+				SELECT * FROM `{$uTable}`
+				WHERE `id` in (".sqlValues($users).")
+			";
+
+			$users	= mwDB()->query($sql)->asArray('id');
+
+			// Storing user data in each application row
+			foreach ( $res as $id => &$row ) {
 				
-			// Storing user as subarray
-			$row['user']	= $users[$row['user_id']];
+				// Skipping problematic ones
+				if ( empty($row['user_id']) or empty($users[$row['user_id']]) )
+					continue;
+					
+				// Storing user as subarray
+				$row['user']	= $users[$row['user_id']];
+				
+			} //FOR each row
 			
-		} //FOR each row
-
+		} //IF found users
+		
 		return $res;
 
 	} //FUNC getList

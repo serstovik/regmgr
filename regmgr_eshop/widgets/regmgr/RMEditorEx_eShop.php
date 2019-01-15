@@ -1,9 +1,13 @@
 <?php
-/**//** ----= CLASS mwRMEditorEx_eShop	=------------------------------------------------------------------------------\**//** \
- *
- *
- *
- *\**//** ----------------------------------------------------------------= by SerStoVik @ Morad Media Inc.	=------/** //**/
+/** //** ----= CLASS mwRMEditorEx_eShop	=------------------------------------------------------------------------------\**//** \
+*
+* 	eShop products editor for application editor.
+*
+* 	@package	morweb
+* 	@subpackage	regmgr
+* 	@category	widget
+*
+\**//** ---------------------------------------------------------------------------= by Mr.V!T @ Morad Media Inc. =----/** //**/
 class mwRMEditorEx_eShop extends mwRMEditorEx {
 
 	function editor_products () {
@@ -26,7 +30,7 @@ class mwRMEditorEx_eShop extends mwRMEditorEx {
 		// Loading css for list
 	//	$this->load->css('regmgr_eshop.css');
 	?>
-		<link type="text/css" href="/res/regmgr_eshop/css/regmgr_eshop.css?<?=randomString()?>" rel="stylesheet" />
+		<link type="text/css" href="/res/regmgr_eshop/css/regmgr_eshop.css" rel="stylesheet" />
 		
 		<div id="eShop-modifyButton" class="mwDialog">
 			<div class="cell-100"><input type="button" value="Modify Products" class="full" /></div>
