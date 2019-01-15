@@ -53,22 +53,31 @@ var rmNotes	=  (function () {
 							mwAjax(RM_BACKEND_NOTES_AJAX + '/addNote/', $params)
 
 								.success(function ($data) {
-									// var $newEl	= $this.dom.wrapper.find('dl').last('dl').clone();
-									//update element Data
-									var newEl = "<dl class='mwDialog' id='" + $data.content.id + "'>";
-									newEl += "<dt class='rmnotes-user-data'><strong>User: </strong>" + $data.content.user_data.email + "</dt>";
-									newEl += "<dt class='rmnotes-date'><strong>Date: </strong>" + $data.content.modified + "</dt>";
-									newEl += "<dt class='rmnotes-text'><strong>Note: </strong>" + $data.content.text + "</dt>";
-									newEl += "<br>";
-									newEl += "<div class='rmnotes-update-section " + $data.content.id + "' style='display: none;'>";
-									newEl += "<div class='rmnotes-update-section " + $data.content.id + "'>";
-									newEl += "<textarea name='update_note_" + $data.content.id + "'></textarea>";
-									newEl += "</div></div>";
-									// newEl += "<button rel='" + $data.content.id + "' class='rmnotes-edit-btn " + $data.content.id + "'>Update</button>";
-									// newEl += "<button rel='" + $data.content.id + "' class='rmnotes-remove-btn'>Remove</button>";
-									newEl += "<hr></dl>";
 
-									jQuery(newEl).appendTo($this.dom.wrapper);
+									if($data.content != undefined){
+										
+										// var $newEl	= $this.dom.wrapper.find('dl').last('dl').clone();
+										//update element Data
+										var newEl = "<dl class='mwDialog' id='" + $data.content.id + "'>";
+										newEl += "<dt class='rmnotes-user-data'><strong>User: </strong>" + $data.content.user_data.email + "</dt>";
+										newEl += "<dt class='rmnotes-date'><strong>Date: </strong>" + $data.content.modified + "</dt>";
+										newEl += "<dt class='rmnotes-text'><strong>Note: </strong>" + $data.content.text + "</dt>";
+										newEl += "<br>";
+										newEl += "<div class='rmnotes-update-section " + $data.content.id + "' style='display: none;'>";
+										newEl += "<div class='rmnotes-update-section " + $data.content.id + "'>";
+										newEl += "<textarea name='update_note_" + $data.content.id + "'></textarea>";
+										newEl += "</div></div>";
+										// newEl += "<button rel='" + $data.content.id + "' class='rmnotes-edit-btn " + $data.content.id + "'>Update</button>";
+										// newEl += "<button rel='" + $data.content.id + "' class='rmnotes-remove-btn'>Remove</button>";
+										newEl += "<hr></dl>";
+	
+										jQuery(newEl).appendTo($this.dom.wrapper);
+										
+										$this.dom.textArea.parent().css('border', '1px solid #828282');
+										
+									} else {
+										$this.dom.textArea.parent().css('border', '1px solid red');	
+									}
 
 									//clear textbox
 									$this.dom.textArea.val('');
@@ -78,7 +87,6 @@ var rmNotes	=  (function () {
 								}) //FUNC success
 
 								.error(function ($data) {
-									//__($data);
 								}) //FUNC error
 
 								.go();
