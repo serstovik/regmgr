@@ -93,6 +93,9 @@ class mwRMEditorEx_user extends mwRMEditorEx {
 
 		$this->user = new mwUserRow;
 
+		// Passing configuration for proper validations
+		$this->user->EmailLogin = User::get()->EmailLogin;
+
 		// If ID provided - loading user data
 		// This will also setup groups and forms
 		if ( $id )
