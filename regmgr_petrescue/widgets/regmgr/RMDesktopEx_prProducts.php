@@ -13,8 +13,11 @@ class mwRMDesktopEx_prProducts extends mwRMDesktopEx {
 	public function column_products ( $alias, $row, $cfg ) {
 
 		// Nothing to do if no eShop/items recorded
-		if ( empty($row['extensions']['eShop']['items']) )
+		if ( empty($row['extensions']['eShop']['cart']) )
 			return;
+
+		// Decoding items data
+		$cart	= json_decode($row['extensions']['eShop']['cart'], true);
 
 		$items = $row['extensions']['eShop']['items'];
 
@@ -22,9 +25,12 @@ class mwRMDesktopEx_prProducts extends mwRMDesktopEx {
 		$this->load->css('regmgr_petrescue.css');
 			
 		// For each item outputting separate <P>
-		foreach ( $items as $i => $iRow ) {
+		// Using iterator for sequent classes
+		$i = 0;
+		foreach ( $cart as $id => $row ) {
+			$i++;
 	?>
-			<p class="prProduct n<?=$i?>"><?=$iRow['item_title']?></p>		
+			<p class="prProduct n<?=$i?>"><?=@$row['item']['title']?></p>		
 	<?php	
 		} //FOR each item
 
