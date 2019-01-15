@@ -69,10 +69,6 @@ class mwRMEditorEx_eShop extends mwRMEditorEx {
 						<th>Title:</th>
 						<td>{title}</td>
 					</tr>
-					<tr>
-						<th>Price:</th>
-						<td>{price}</td>
-					</tr>
 				</table>
 			</div>		
 		</div>
