@@ -14,6 +14,7 @@ class tplRMFormRows extends vTpl2 {
 	public	$backend		= false;			// Backend editor rendering flag.
 	public	$load			= false;			// Section loader.
 	
+	public	$dataName		= 'rows';			// Data name to which group inputs on row.
 	public	$data			= [];				// Rows data to prefill with.
 	
 	public	$mask			= '__k__';			// Inputs key mask.
@@ -124,7 +125,7 @@ class tplRMFormRows extends vTpl2 {
 		// Have to do it for each individual row, for correct prefill support
 		$node->parse()->inputs( function ($node) {
 			
-			return $node->render()->prefixInput('rows[{k}]', true);
+			return $node->render()->prefixInput($this->dataName.'[{k}]', true);
 			
 		}); //FUNC render.inputs
 

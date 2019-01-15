@@ -50,8 +50,8 @@ class mwRMApplicationEx_formRows extends mwRMApplicationEx {
 
 			jQuery( function () {
 	
-				if ( !window._RMFR )
-					window._RMFR = rmFormRows( jQuery('#<?=$sn?>'), {});
+				if ( !window._<?=$sn?> )
+					window._<?=$sn?> = rmFormRows( jQuery('#<?=$sn?>'), {});
 				
 			}); //jQuery.onLoad
 		

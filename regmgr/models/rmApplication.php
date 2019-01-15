@@ -138,6 +138,9 @@ class rmApplication extends vDBObject {
 		$sql	= "SELECT * FROM {$this->Table}" . $where;
 		$res	= mwDB()->query($sql)->asArray('id'); 
 
+		if ( !$res )
+			return $res;
+
 		// Post processing
 		$users	= [];
 		foreach ( $res as $id => &$row ) {
