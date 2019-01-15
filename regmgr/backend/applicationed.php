@@ -308,11 +308,11 @@ class mwApplicationEd extends mwEditor {
 			<tr>
 			<?php	foreach ( $tabs as $name => $row ) { ?>
 
-					<td rel="<?=$name?>" onclick="jQuery('#<?=$this->EditorName?>_panel').removeClass('hidden'); mwSwitchTab(this);"><?=$row['caption']?></td>
+					<td rel="<?=$name?>" <?=( $row['selected'] ? 'class="Selected selected"' : '');?> onclick="jQuery('#<?=$this->EditorName?>_panel').removeClass('hidden'); mwSwitchTab(this);"><?=$row['caption']?></td>
 
 			<?php	} //FOR each widget ?>
 
-				<td rel="tab_off" class="selected" onclick="jQuery('#<?=$this->EditorName?>_panel').toggleClass('hidden')">&gt;</td>
+				<td rel="tab_off" onclick="jQuery('#<?=$this->EditorName?>_panel').toggleClass('hidden')">&gt;</td>
 			</tr>
 		</table>
 	<?php
