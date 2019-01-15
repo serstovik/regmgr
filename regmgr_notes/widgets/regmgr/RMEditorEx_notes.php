@@ -24,6 +24,7 @@
 			$appId	= $this->application->id;
 		
 		$notes		= $RMNotes->getNotesByAppId($appId);
+		
 		if ($notes && is_array($notes)){
 			
 			$notes		= $this->addUsersToNotes($notes);
@@ -34,9 +35,10 @@
 
 				$notesHtml	.= "<dl  class='mwDialog' id='".$note['id']."'>";
 
-				$notesHtml	.= '<dt class="rmnotes-user-data"><strong>User: </strong>'.$note['user_data']['email'].'</dt>';
-				$notesHtml	.= '<dt class="rmnotes-date"><strong>Date: </strong>'.$note['modified'].'</dt>';
-				$notesHtml	.= '<dt class="rmnotes-text"><strong>Note: </strong>'.$note['text'].'</dt>';
+				$notesHtml	.= '<dt class="rmnotes-user-data"><div class="rmnotes-user-data" style="float: left;"><strong>User: </strong>'.$note['user_data']['email'].'</div><div style="float: right;" class="rmnotes-date"><strong>Date: </strong>'.$note['modified'].'</div></dt>';
+				//$notesHtml	.= '<dt class="rmnotes-date" style="float: right;"><strong>Date: </strong>'.$note['modified'].'</dt>';
+				$notesHtml	.= '<dt class="rmnotes-text" style="height: auto;"><strong>Note: </strong>'.$note['text'].'</dt>';
+				
 				$notesHtml	.= '<br/>';
 
 				$notesHtml	.= '<div class="rmnotes-update-section '.$note['id'].'"><textarea name="update_note_'.$note['id'].'"></textarea></div>';
