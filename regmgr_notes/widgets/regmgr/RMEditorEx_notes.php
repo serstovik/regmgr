@@ -35,9 +35,9 @@
 
 				$notesHtml	.= "<dl  class='mwDialog' id='".$note['id']."'>";
 
-				$notesHtml	.= '<dt class="rmnotes-user-data"><div class="rmnotes-user-data" style="float: left;"><strong>User: </strong>'.$note['user_data']['email'].'</div><div style="float: right;" class="rmnotes-date"><strong>Date: </strong>'.$note['modified'].'</div></dt>';
+				$notesHtml	.= '<dt class="rmnotes-user-data"><div class="rmnotes-user-data" style="float: left;"><strong>'.$note['user_data']['email'].'</strong></div><div style="float: right;" class="rmnotes-date">'.$note['modified'].'</div></dt>';
 				//$notesHtml	.= '<dt class="rmnotes-date" style="float: right;"><strong>Date: </strong>'.$note['modified'].'</dt>';
-				$notesHtml	.= '<dt class="rmnotes-text" style="height: auto;"><strong>Note: </strong>'.$note['text'].'</dt>';
+				$notesHtml	.= '<dt class="rmnotes-text" style="height: auto;">'.$note['text'].'</dt>';
 				
 				$notesHtml	.= '<br/>';
 
