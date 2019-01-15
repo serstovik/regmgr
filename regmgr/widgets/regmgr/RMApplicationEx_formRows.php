@@ -18,6 +18,15 @@ class mwRMApplicationEx_formRows extends mwRMApplicationEx {
 		
 		// Using unique SN for JS init
 		$sn	= newSN('R');
+
+		// Getting name
+		if ( $node->attr['name'] and isAlphaDash($node->attr['name']) )
+			$name	= $node->attr['name'];
+		else
+			$name	= 'rows';
+		
+		// And rows data
+		$data	= empty($this->data[$name]) ? [] : $this->data[$name]; 
 		
 		// Using dedicated model to parse rows
 		$tpl = $this->load->model('tplRMFormRows', true);
@@ -27,7 +36,8 @@ class mwRMApplicationEx_formRows extends mwRMApplicationEx {
 			->load( $this->load )			// Providing loader 
 			->html( $node->html() )			// Setting up html
 			->backend( $this->backend )		// Adding backend flag
-			->data( $this->data )			// Supplying with data
+			->name( $name )				// Supplying name
+			->data( $data )			// and data
 			->main()
 		; //$tpl
 		

@@ -14,7 +14,7 @@ class tplRMFormRows extends vTpl2 {
 	public	$backend		= false;			// Backend editor rendering flag.
 	public	$load			= false;			// Section loader.
 	
-	public	$dataName		= 'rows';			// Data name to which group inputs on row.
+	public	$name			= 'rows';			// Data name to which group inputs on row.
 	public	$data			= [];				// Rows data to prefill with.
 	
 	public	$mask			= '__k__';			// Inputs key mask.
@@ -58,25 +58,21 @@ class tplRMFormRows extends vTpl2 {
 		$node->parse()->section('formRow', function ($node) {
 
 		// ---- Data ----
-			
-			// Grabbing data if available
-			// If no data - need to have 1 empty row
-			// By default using 1 as starting key, but don't really care about keys below
 
 			// Clearing trash if happen
-			unset($this->data['rows'][$this->mask]);
+			unset($this->data[$this->mask]);
 			
-			if ( empty($this->data['rows']) )
-				$data		= [1 => []];
-			else
-				$data		= $this->data['rows'];
+			// If no data - need to have 1 empty row
+			// By default using 1 as starting key, but don't really care about keys below
+			if ( !$this->data or !is_array($this->data) )
+				$this->data	= [1 => []];
 
 		// ---- Rows ----
 
 			// Rendering each row and collecting html
 			$html		= '';
 
-			foreach ( $data as $key => $row ) {
+			foreach ( $this->data as $key => $row ) {
 
 				// Using node clone to generate each row
 				$rNode		= $node->_clone();
@@ -125,7 +121,7 @@ class tplRMFormRows extends vTpl2 {
 		// Have to do it for each individual row, for correct prefill support
 		$node->parse()->inputs( function ($node) {
 			
-			return $node->render()->prefixInput($this->dataName.'[{k}]', true);
+			return $node->render()->prefixInput($this->name.'[{k}]', true);
 			
 		}); //FUNC render.inputs
 
