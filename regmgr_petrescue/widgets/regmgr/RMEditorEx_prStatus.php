@@ -68,7 +68,7 @@ class mwRMEditorEx_prStatus extends mwRMEditorEx_status
 		
 		<div id="postHistory" class="winContent">
 			<table class="mwDialog tall">
-				<tr><th>Current Application Status: <span id="regmgr_approve_text"></span></th></tr>
+				<tr><th>Current Application Status: <b><span id="regmgr_approve_text"></span></b></th></tr>
 				<?php if( !empty($cart) ): ?>
 				<tr><th>Select Pet to Approve:</th></tr>
 				<tr><td>
