@@ -62,6 +62,9 @@ var applicationEd = (function () {
 		// Cleaning ghost mwDialog
 		$tabs.find('.mwDialog').removeClass('mwDialog');
 
+		// Also selecting selected editor tab
+		$this.dom.form.find('.mwWinTabs td.selected').click();
+		
 		return this; 
 
 	}, //FUNC resetDialog

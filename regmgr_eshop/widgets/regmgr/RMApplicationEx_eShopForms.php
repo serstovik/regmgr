@@ -1,9 +1,13 @@
 <?php
-/**//** ----= CLASS mwRMApplicationEx_eShopForms	=--------------------------------------------------------------\**//** \
- *
- *
- *
- *\**//** ----------------------------------------------------------------= by SerStoVik @ Morad Media Inc.	=------/** //**/
+/** //** ----= CLASS mwRMApplicationEx_eShopForms	=--------------------------------------------------------------\**//** \
+*
+* 	eShop multiforms renderer.
+*
+* 	@package	morweb
+* 	@subpackage	regmgr
+* 	@category	widget
+*
+\**//** ---------------------------------------------------------------------------= by Mr.V!T @ Morad Media Inc. =----/** //**/
 class mwRMApplicationEx_eShopForms extends mwRMApplicationEx {
 
 	public	$extName	= 'eShop';				// Extension name. If omited - widget name will be used.
@@ -109,10 +113,6 @@ class mwRMApplicationEx_eShopForms extends mwRMApplicationEx {
 		// Done, outputting collected html
 		echo($html);
 
-		// Encoding cart data into input
-	?>
-		<textarea name="cart" style="display: none;"><?=json_encode($this->cart->data)?></textarea>
-	<?php
 	} //FUNC render
 
 } //CLASS mwRMApplicationEx_eShopForms

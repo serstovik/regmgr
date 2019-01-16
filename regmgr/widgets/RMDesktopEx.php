@@ -22,6 +22,14 @@ class mwRMDesktopEx extends mwWidget
 		
 		$cfg['alias'] = $alias;
 		
+		if ( !empty($row['extensions']) ) {
+			
+			$row['custom'] = [];
+			foreach( $row['extensions'] as $v )
+				$row['custom'] = array_merge($row['custom'], $v);
+			
+		}
+		
 		echo $this->renderTemplate($row, $template, $cfg);
 		
 	} //FUNC column
@@ -39,7 +47,7 @@ class mwRMDesktopEx extends mwWidget
 		$options = array_merge($def, $options);
 		
 		// Parsing with tpl for nested arrays support
-		$html	= (new vTpl2($template))->parse()->vars($row)->html();
+		$html	= (new vTpl2($template))->parse()->vars($row)->cleanVars()->html();
 		
 	//	$html = arrayToTemplate($row, $template);
 		

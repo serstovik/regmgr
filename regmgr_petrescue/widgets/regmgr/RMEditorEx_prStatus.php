@@ -13,6 +13,8 @@ class mwRMEditorEx_prStatus extends mwRMEditorEx_status
 		//__($this->application->extensions['eShop']['items']);
 		
 		$statuses = rmCfg()->getStatuses();
+		//__($this->cfg);
+		//$cfg = rmCfg()->getBranch('backend', 'editor');
 		
 		//default statuses names
 		$coreDefault = [
@@ -48,29 +50,43 @@ class mwRMEditorEx_prStatus extends mwRMEditorEx_status
 		$statuses = array_merge([0 => 'Select Status'], $statuses);
 		//__($statuses);
 		
+		// Decoding items data
+		$cart = json_decode($this->application->extensions['eShop']['cart'], true);
+		//__($cart);
+		
+		//custom tab
+		$custom_html = '';
+		if( !empty($this->cfg['template']) ) {
+			
+			$file = compilePath(SITE_TEMPLATES_PATH, 'regmgr', $this->cfg['template']);
+			//$body = loadView($file, $data);
+			$custom_html = loadView($file, []);
+			
+		}
+		
 		?>
 		
 		<div id="postHistory" class="winContent">
 			<table class="mwDialog tall">
-				<tr><th>Current Application Status: <span id="regmgr_approve_text"></span></th></tr>
-				<?php if( !empty($this->application->extensions['eShop']['items']) ): ?>
-				<tr><th>
+				<tr><th>Current Status: <b><span id="regmgr_approve_text"></span></b></th></tr>
+				<?php if( !empty($cart) ): ?>
+				<tr><th>Select Pet to Approve:</th></tr>
+				<tr><td>
 					<select class="approve-products-list" name="product">
-						<option value="">Please Select Pet to Approve</option>
-						<?php foreach($this->application->extensions['eShop']['items'] as $k => $v): ?>
-						<option value="<?=$k?>"><?=$v['item_title']?></option>
+						<option value="">--</option>
+						<?php foreach($cart as $v): ?>
+						<option value="<?=$v['id']?>"><?=$v['item']['title']?></option>
 						<?php endforeach;?>
 					</select>
-				</th></tr>
+				</td></tr>
 				<?php endif; ?>
 				<tr><td>
 					<input hint="Approve application" class="Hi full cell-60 approve-btn" type="button" value="Approve" onClick="regmgr_update_approve('approved')" />
 					<input hint="Decline application" class="Red full cell-40" type="button" value="Decline" onClick="regmgr_update_approve('declined');"/>
 					<!--input id="regmgr_approval_value" type="hidden" name="approval_value" /-->
 				</td></tr>
-				
 				<?php if( sizeof($statuses) > 1 ):?>
-				<tr><th>Custom Statuses:</th></tr>
+				<tr><th>Application Status:</th></tr>
 				<tr><td>
 					<select name="status_minor" id="regmgr_minor_status" onChange="jQuery('[name=status_minor]').val(jQuery(this).val());">
 					<?foreach($statuses as $k => $v):?>
@@ -79,6 +95,7 @@ class mwRMEditorEx_prStatus extends mwRMEditorEx_status
 					</select>
 				</td></tr>
 				<?php endif;?>
+				<?=$custom_html?>
 			</table>
 		</div>
 		<script>

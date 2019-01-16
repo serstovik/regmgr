@@ -62,7 +62,7 @@ class mwSystemEvent_regmgrMailer extends mwSystemEvent {
 					
 					$body = (new vTpl2($body))->parse()->vars($data)->html();
 					
-					__($to, $from, $body, $subject);
+					//__($to, $from, $body, $subject);
 					$this->email($to, $from, $body, $subject);
 					
 				}

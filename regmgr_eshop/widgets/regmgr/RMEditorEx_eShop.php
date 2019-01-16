@@ -32,7 +32,7 @@ class mwRMEditorEx_eShop extends mwRMEditorEx {
 	?>
 		<link type="text/css" href="/res/regmgr_eshop/css/regmgr_eshop.css" rel="stylesheet" />
 		
-		<div id="eShop-modifyButton" class="mwDialog">
+		<div id="eShop-modifyButton" class="mwDialog" style="display: none;">
 			<div class="cell-100"><input type="button" value="Modify Products" class="full" /></div>
 		</div>
 
@@ -68,10 +68,6 @@ class mwRMEditorEx_eShop extends mwRMEditorEx {
 					<tr>
 						<th>Title:</th>
 						<td>{title}</td>
-					</tr>
-					<tr>
-						<th>Price:</th>
-						<td>{price}</td>
 					</tr>
 				</table>
 			</div>		
