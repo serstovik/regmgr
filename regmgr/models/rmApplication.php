@@ -185,6 +185,16 @@ class rmApplication extends vDBObject {
 		return $res;
 
 	} //FUNC getList
+	
+	function getDescValues($field) {
+		
+		$sql	= '
+			SELECT DISTINCT ' . $field . ' FROM ' . $this->Table . '
+		';
 
+		return mwDB()->query($sql)->asArray();
+		
+	} //FUNC getDescValues
+	
 } //CLASS rmApplication
 

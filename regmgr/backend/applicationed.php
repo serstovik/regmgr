@@ -264,6 +264,9 @@ class mwApplicationEd extends mwEditor {
 			else //use default method if not
 				$method		= 'editor';
 			
+			// config data
+			$w->cfg = $cfg[$name];
+			
 			$tabs['tab_' . $name] = [
 
 				'name'		=> $name,			// Tab short name
