@@ -85,7 +85,6 @@ class mwRMEditorEx_prStatus extends mwRMEditorEx_status
 					<input hint="Decline application" class="Red full cell-40" type="button" value="Decline" onClick="regmgr_update_approve('declined');"/>
 					<!--input id="regmgr_approval_value" type="hidden" name="approval_value" /-->
 				</td></tr>
-				<?=$custom_html?>
 				<?php if( sizeof($statuses) > 1 ):?>
 				<tr><th>Application Status:</th></tr>
 				<tr><td>
@@ -96,6 +95,7 @@ class mwRMEditorEx_prStatus extends mwRMEditorEx_status
 					</select>
 				</td></tr>
 				<?php endif;?>
+				<?=$custom_html?>
 			</table>
 		</div>
 		<script>
