@@ -14,6 +14,7 @@ class mwRMEditorEx extends mwWidget {
 
 	public	$application	= false;	// Current application.
 	public	$data		= [];		// Extension data.
+	public	$cfg		= [];		// Config used to load extension
 
 	function editor () {
 	} //FUNC editor
@@ -25,5 +26,8 @@ class mwRMEditorEx extends mwWidget {
 	function save ($data) {
 		return $data;
 	} //FUNC save
+
+	function initResources () {
+	} //FUNC initResources
 
 } //CLASS mwRMEditorEx

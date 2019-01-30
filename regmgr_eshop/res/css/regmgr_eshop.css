@@ -46,7 +46,7 @@
 
 .eShop-productsList .details>table th
 {
-	width			: 100px;
+	width			: 70px;
 	padding-right		: <?=$margin?>px;
 	text-align		: right;
 }
