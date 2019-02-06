@@ -58,21 +58,25 @@
 			$notesHtml	= '<section id="rmnotes_list"></section>';
 		}
 
-		echo $notesHtml;
 	?>
 
 		<dl class="mwDialog">
 
-			<dt>Admin Notes</dt>
-			<dd><textarea name="admin_notes" style="height: 200px;" value=""></textarea></dd>
+			<dt>Add Note:</dt>
+			<dd><textarea name="admin_notes" rows="3" style="height: 50px;" value=""></textarea></dd>
 <?php
 			/*
 			<button rel="<?=$appId?>" class="regmgr-submit-note">Add</button>
 			*/
 ?>
-			<input rel="<?=$appId?>" class="regmgr-submit-note" type="button" value="Add Note" />
+			<input rel="<?=$appId?>" class="regmgr-submit-note" type="button" value="Add" />
 		</dl>
-
+		<br>
+		<hr>
+		<br>
+		
+		<?=$notesHtml;?>
+		
 		<script type="text/javascript" src="/res/regmgr_notes/js/regmgr_notes.js"></script>
 		<script type="text/javascript">
 			//todo: move it to css file

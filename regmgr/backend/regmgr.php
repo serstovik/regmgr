@@ -50,7 +50,7 @@ class mwRegmgr extends mwController
 		if ( $this->isAjax )
 			return;
 
-		$this->load->editor('applicationEd')->loadJS();
+		$this->load->editor('applicationEd', ['item' => $this->app])->loadJS();
 		
 		$section = 'Register Manager';
 		

@@ -81,7 +81,7 @@ class mwRMApplicationEx_eShop extends mwRMApplicationEx {
 
 		// Encoding cart data into input
 	?>
-		<textarea name="cart" style="display: none;"><?=json_encode($data)?></textarea>
+		<textarea name="cart" id="eShop-cart" style="display: none;"><?=json_encode($data)?></textarea>
 	<?php
 	} //FUNC render
 

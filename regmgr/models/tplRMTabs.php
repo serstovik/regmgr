@@ -230,7 +230,7 @@ class tplRMTabs extends vTpl2 {
 		<dl class="mwDialog tools rmTabs-backend">
 
 			<dd>
-				<table class="mwWinTabs">
+				<table class="mwWinTabs" id="applicationEd_formTabs">
 					<tr>
 
 					<?php	foreach ( $tabs as $name => $row ) { ?>

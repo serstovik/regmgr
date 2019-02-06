@@ -149,6 +149,8 @@ class mwApplicationEd extends mwEditor {
 		//trigger status event
 		(new mwEvent('regmgr.status.' . $this->Item->statusMajor))->trigger($this->Item);
 		
+	//	$this->loadWindow();
+		
 	} //FUNC onBeforeSave
 
 // ---- VIEWS ------------------------------------------------------------------------------------------------------------------	
@@ -307,7 +309,7 @@ class mwApplicationEd extends mwEditor {
 
 	function winTabsHeads ($tabs) {
 	?>
-		<table class="mwWinTabs">
+		<table class="mwWinTabs" id="<?=$this->EditorName?>_editorTabs">
 			<tr>
 			<?php	foreach ( $tabs as $name => $row ) { ?>
 
@@ -417,50 +419,55 @@ class mwApplicationEd extends mwEditor {
 		//loop index part of config
 		foreach( $cfg as $cfgKey => $cfgVal ) {
 			
-			$columnWidget = false;
+			// Splitting extension into widget/method pair
+			// If method omited - assuming default render
+			list($widget, $methos)	= explode('.', $cfgVal['extension']);
 			
-			//can be 1 or more parts, 1st part always widget name
-			$ext = explode('.', $cfgVal['extension']);
-			$widget	= $ext[0];
+			// Loading extension widget
+			$obj			= $this->load->widget('RMEditorEx', $widget);
 			
-			$this->extensions[$cfgKey] = $this->load->widget('RMEditorEx', $widget);
-			/*
-			//check is widget exists
-			if ( $this->extensions[$cfgKey] ) {
-				
-				// Defining extension name
-				if ( !$this->extensions[$cfgKey]->extName )
-					$this->extensions[$cfgKey]->extName = $this->extensions[$cfgKey]->WidgetName;
-				
-				// Setting up object
-				$this->extensions[$cfgKey]->application = $this->Item;
-				
-				// Providing link to extension data
-				$this->extensions[$cfgKey]->data	= &$this->Item->extensions[$this->extensions[$cfgKey]->extName];
-				
-			}
-			*/
-		}
-		
-		// Looping through extensions and preparing each
-		foreach ( $this->extensions as $name => $obj ) {
-
+			// Skipping failed widgets
+			if ( !$obj )
+				continue;
+			
 			// Defining extension name
 			if ( !$obj->extName )
-				$obj->extName	= $obj->WidgetName;
+				$obj->extName		= $obj->WidgetName;
 			
 			// Setting up object
-			$obj->application = $this->Item;
+			$obj->application	= $this->Item;
 			
 			// Providing link to extension data
-			$obj->data	= &$this->Item->extensions[$obj->extName];
+			$obj->data		= &$this->Item->extensions[$obj->extName];
 			
-		} //FOR each extension
+			// Supplying config and initiating properties with it
+			$obj->cfg		= $cfgVal;
+			$obj->_fromArray($cfgVal);
+
+			// Storing in cache			
+			$this->extensions[$cfgKey] = $obj;
+			 
+		} //FOR each config
 		
 		// Done
 		return $this->extensions;
 
 	} //FUNC loadExtensions
+
+	function loadJS () {
+		
+		parent::loadJS();
+		
+		// Loading widgets and calling loadJS for them
+		$wgts = $this->loadExtensions();
+		
+		foreach ( $wgts as $name => $wgt ) {
+
+			$wgt->initResources();
+			
+		} //FOR each widget
+		
+	} //FUNC loadJS
 
 } //CLASS mwApplicationEd
 ?>

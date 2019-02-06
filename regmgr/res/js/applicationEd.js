@@ -91,6 +91,72 @@ var applicationEd = (function () {
 		return $this;
 
 	}, //FUNC dialog
+
+	/** //** ----= apply	=--------------------------------------------------------------------------------------\**//** \
+	*
+	*	Dialog save/reload. Adds tabs control.
+	*
+	*	@return SELF
+	*
+	\**//** -------------------------------------------------------------------= by Mr.V!T @ Morad Media Inc. =----/** //**/
+	apply		: function ($callback) {
+
+		var $this	= this;
+		
+		// Saving current tabs positions
+		// ToDo: stupport for mw3 winTabs.
+		var $tabs	= {};
+		
+		// Searching tabs
+		$this.Body.find('.mwWinTabs').each( function () {
+			
+			// Creating shortcuts
+			var $el		= jQuery(this);
+			var $id		= $el.attr('id');
+			
+			// Skipping ones without ID - can't store those
+			if ( !$id )
+				return;
+
+			// Looking for selected tab, if none is selected - no need to store it
+			// Using both mw3 and mw2 syntax
+			var $sel	= $el.find('.Selected, .selected').first();
+			
+			// Saving current states and IDs, if tab have one
+			var $rel	= $sel.attr('rel');
+			
+			if ( !$rel )
+				return;
+				
+			$tabs[$id] = $rel;
+			
+		}); //FUNC each tab
+		
+		// Calling normal apply, adding custom callback
+		$parent.apply.call($this, function ($data) {
+
+			// Temporarily hiding form to speed up animations
+			$this.Form.hide();	
+			
+			// Restoring saved tabs
+			for ( var $id in $tabs ) {
+				
+				// Clicking instead of moving selection - this allows proper switching events
+				$this.Body.find('#'+$id+' [rel='+$tabs[$id]+']')
+					.click();
+				
+			} //FOR each tab
+
+			// Displaying form again
+			$this.Form.show();	
+			
+			// reIssuing callback
+			if ( isFunction($callback) )
+				$callback($data);
+			
+		}); //FUNC apply
+		
+	}, //FUNC apply
 	
 	del		: function ($id, $text) {
 		
