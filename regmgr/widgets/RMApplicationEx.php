@@ -16,14 +16,29 @@ class mwRMApplicationEx extends mwWidget {
 	public	$data		= [];		// Extension data.
 
 	public	$tpl		= false;	// Callee template model.
-
+	
+	function parse ($html) {
+		
+		return $html;
+		
+	} //FUNC parse
+	
 	function render ($node) {
+		
+		return '';
+		
 	} //FUNC render
 
-	function validate () {
+	function validate ($data) {
+		
+		return $data;
+		
 	} //FUNC validate
 
-	function save () {
+	function save ($data) {
+		
+		return $data;
+		
 	} //FUNC save
 
 } //CLASS mwRMApplicationEx

@@ -66,7 +66,9 @@ var rmApplicationAdmin		= function ($el) {
 				});
 
 		}); //FUNC each.row
-
+		
+		//init filter select
+		
 		$this.onInit($this);
 
 	}, //FUNC init

@@ -189,6 +189,7 @@ class mwRegmgr extends mwController
 	
 	function _getBarHtml() {
 		
+		//get sorting config data
 		$sortingCFG = rmCfg()->getBranch('core', 'sorting');
 		
 		//__($sortingCFG);
@@ -197,31 +198,35 @@ class mwRegmgr extends mwController
 		
 		if ( !empty($sortingCFG) ) {
 			
-			foreach($sortingCFG as $sortField => $sortVal) {
+			$html .= '<select id="regmgr_sorting">';
+			
+			//get default sorting text not in loop to make it always on top
+			$default = 'Order By';
+			if ( !empty($sortingCFG['default']) ) {
 				
-				if ( !empty($sortVal['text']) )
-					$text = $sortVal['text'];
-				else
-					$text = 'Order By ' . $sortField;
+				$exp = explode('|', $sortingCFG['default']);
+				//2nd part is display for select
+				if ( !empty($exp[1]) ) $default = trim($exp[1]);
 				
-				if ( !empty($sortVal['asc']) )
-					$asc = $sortVal['asc'];
-				else
-					$asc = 'Order By ' . $sortField . ' ASC';
-				
-				if ( !empty($sortVal['desc']) )
-					$desc = $sortVal['desc'];
-				else
-					$desc = 'Order By ' . $sortField . ' DESC';
-				
-				$html .= '<select data-order="' . $order . '" id="sorting_' . $sortField . '">';
-				$html .= '<option value="">' . $text . '</option>';
-				$html .= '<option value="asc">' . $asc . '</option>';
-				$html .= '<option value="desc">' . $desc . '</option>';
-				
-				$html .= '</select>';
+				//remove from array to generate others
+				unset($sortingCFG['default']);
 				
 			}
+			
+			//generate default option
+			$html .= '<option value="">' . $default . '</option>';
+			
+			foreach( $sortingCFG as $sortKey => $sortVal ) {
+				
+				$exp = explode('|', $sortVal);
+				
+				//2nd part is display for select
+				if ( !empty($exp[1]) )
+					$html .= '<option value="' . $sortKey . '">' . trim($exp[1]) . '</option>';
+				
+			}
+			
+			$html .= '</select>';
 			
 		}
 		
