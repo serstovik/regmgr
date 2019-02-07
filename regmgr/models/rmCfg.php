@@ -107,6 +107,49 @@ class rmCfg extends vObject {
 
 		return $this->getBranch('emails', $event);
 
-	} //FUNC getStatuses
+	} //FUNC getEmails
+	
+	function getSorting () {
+		
+		//load sorting data from cfg
+		$sortingCFG = rmCfg()->getBranch('core', 'sorting');
+		
+		//sorting result array
+		$result = [];
+		
+		//check is sorting data exists
+		if ( !empty($sortingCFG) ) {
+			
+			foreach($sortingCFG as $k => $v) {
+				
+				//check is sorting not empty at all
+				if ( !empty($v) ) {
+					
+					//init sorting
+					$result[$k] = [];
+					
+					//split on 2 parts
+					$exp = explode('|', $v);
+					
+					//2nd part is display for select
+					if ( !empty($exp[1]) ) {
+						
+						$result[$k]['value'] = trim($exp[0]);
+						$result[$k]['title'] = trim($exp[1]);
+						
+					}
+					else {
+						
+						$result[$k]['value'] = trim($exp[0]);
+						$result[$k]['title'] = trim($exp[0]);
+						
+					}
+				}
+			}
+		}
+		
+		return $result;
 
+	} //FUNC getSorting
+	
 } //CLASS rmCfg

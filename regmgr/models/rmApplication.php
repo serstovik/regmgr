@@ -117,10 +117,12 @@ class rmApplication extends vDBObject {
 	
 	function getList ($options = []) {
 	
+	//__($options);
 	// ---- Filter ----
 		
 		$where = '';
 		
+		//add filter by type
 		if ( !empty($options['type']) ) {
 			
 			if ( empty($where) )
@@ -131,11 +133,20 @@ class rmApplication extends vDBObject {
 			$where .= 'type = \'' . $options['type'] . '\'';
 				
 		} //IF type is set
-	
+		
+		$orderby = '';
+		
+		//add sorting feature
+		if ( !empty($options['sorting']) ) {
+			
+			$orderby .= ' ORDER BY ' . $options['sorting'];
+				
+		} //IF type is set
+		
 	// ---- Applications ----	
 		
 		// Loading items from DB
-		$sql	= "SELECT * FROM {$this->Table}" . $where;
+		$sql	= "SELECT * FROM {$this->Table}" . $where . $orderby;
 		$res	= mwDB()->query($sql)->asArray('id'); 
 
 		if ( !$res )

@@ -68,6 +68,28 @@ var rmApplicationAdmin		= function ($el) {
 		}); //FUNC each.row
 		
 		//init filter select
+		jQuery('.regmgr_filter').off().change(function(e){
+			
+			var el = jQuery(this);
+			
+			/*
+			var toSend = {};
+			toSend.filter = [];
+			toSend.filter.id = el.attr('id');
+			toSend.filter.value = el.val();
+			___(toSend);
+			*/
+			toSend = {};
+			toSend.filterKey = el.attr('id');
+			toSend.filterValue = el.val();
+			
+			mwAjax(RM_BACKEND_AJAX + '/index', toSend )
+				.go()
+				.success( function($data) {} )
+				.error( function() {} )
+			; // mwAjax
+			
+		});
 		
 		$this.onInit($this);
 

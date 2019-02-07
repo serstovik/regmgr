@@ -30,27 +30,75 @@ class mwRegmgr extends mwController
 		if ( !isset($_SESSION['regmgr']) )
 			$_SESSION['regmgr'] = [];
 		
-		//init filters
-		if ( !isset($_SESSION['regmgr']['filters']) )
-			$_SESSION['regmgr']['filters'] = [];
+		//init list_options
+		if ( !isset($_SESSION['regmgr']['list_options']) )
+			$_SESSION['regmgr']['list_options'] = [];
 		
 		//todo: improve type to fix bugs in case you saving from non type page after there was save from type page
 		//type stored in session makes non type page index updates as last type saved
 		
-		//set filters type
+		//set list_options type
 		if ( !$this->isAjax )
-			$_SESSION['regmgr']['filters']['type'] = $type;
+			$_SESSION['regmgr']['list_options']['type'] = $type;
 		//__($_SESSION['regmgr'], $type);
 		
-		$rows = $this->app->getList($_SESSION['regmgr']['filters']);
+		//set list_options sorting
+		if ( empty($_POST['sorting']) ) {
+			
+			//load sorting cfg data
+			$sortingCFG = rmCfg()->getSorting();
+			//__($sortingCFG);
+			
+			if ( !empty($sortingCFG['default']['value']) )
+				$_SESSION['regmgr']['list_options']['sorting'] = $sortingCFG['default']['value'];
+			else
+				$_SESSION['regmgr']['list_options']['sorting'] = '';
+			
+		}
+		else
+			$_SESSION['regmgr']['list_options']['sorting'] = $_POST['sorting'];
+		
+		$rows = $this->app->getList($_SESSION['regmgr']['list_options']);
+		//__($rows);
+		__($_POST);
+		//set list_options filter
+		if ( !empty( $_POST['filterKey'] ) ) {
+		
+			$_SESSION['regmgr']['list_options']['filter'] = ['key' => $_POST['filterKey'], 'value' => $_POST['filterValue']];
+			
+		}
+		
+		//reset filter on page load
+		if ( !$this->isAjax )
+		$_SESSION['regmgr']['list_options']['filter'] = false;
+		
+		//get filters list
+		$filterCFG = rmCfg()->getBranch('core', 'filter');
+		//__($filterCFG);
+		
+		//get column widgets list
+		$columnList = $this->_getColumnWidgets($filterCFG);
+		//__($columnList);
+		
+		//loop column list and call widgets to filter data
+		foreach( $columnList as $k => $v ) {
+			
+			//generate cell html
+			$rows = call_user_func(
+				[$columnList[$k]['widget'], 'filter_' . $columnList[$k]['method_base']],
+				$rows, $filterCFG[$k], $_SESSION['regmgr']['list_options']['filter']
+			);
+			
+		}
+		
 		$tData = [];
 		
 		$this->_renderIndex($rows, $tData);
 		
 		if ( $this->isAjax )
 			return;
-
-		$this->load->editor('applicationEd', ['item' => $this->app])->loadJS();
+		
+		//$this->load->editor('applicationEd', ['item' => $this->app])->loadJS();
 		
 		$section = 'Register Manager';
 		
@@ -87,8 +135,63 @@ class mwRegmgr extends mwController
 		//heads for index
 		$tableHeads = [];
 		
+		$columnsCFG = rmCfg()->getBranch('backend', 'index');
+		//__($columns_cfg);
+		
+		$widgetsList = $this->_getColumnWidgets($columnsCFG);
+		//__($widgetsList);
+		
 		//loop index part of config
 		foreach( $columnsCFG as $cfgKey => $cfgVal ) {
+			
+			//check is current column is "head" - <th>
+			if ( !empty($cfgVal['class']) and strpos($cfgVal['class'], 'head') != -1 ) {
+			
+				$cellWrap = 'th';
+				
+			}
+			else {
+				
+				$cellWrap = 'td';
+				
+			}
+			
+			//generate and push table header
+			$tableHeads[] = '<' . $cellWrap . '>' . $cfgVal['label'] . '</' . $cellWrap . '>';
+			
+			//prepare column data
+			foreach($rows as $rowKey => $rowVal) {
+				
+				//init columns array
+				if ( !isset($rows[$rowKey]) )
+					$rows[$rowKey]['RMColumns'] = [];
+				
+				//generate cell html
+				$cellHtml = call_user_func( [$widgetsList[$cfgKey]['widget'], '_ob_' . $widgetsList[$cfgKey]['method']], $cfgKey, $rowVal, $cfgVal );
+				
+				//wrap template on in cell tag
+				$cellHtml = '<' . $cellWrap . '>' . $cellHtml . '</' . $cellWrap . '>';
+				
+				//generate column html
+				$rows[$rowKey]['RMColumns'][] = $cellHtml;
+				
+			}
+			
+		}
+		
+		$this->loadContent('table', 'index', array(
+			'heads' => $tableHeads,
+			'rows' => $rows
+		));
+		
+	} //FUNC _renderIndex
+	
+	function _getColumnWidgets($cfg) {
+		
+		$widgetsList = [];
+		
+		//loop index part of config
+		foreach( $cfg as $cfgKey => $cfgVal ) {
 			
 			$columnWidget = false;
 			
@@ -111,7 +214,8 @@ class mwRegmgr extends mwController
 				if ( sizeof($ext) >= 2 ) {
 					
 					$widget		= $ext[0];
-					$method		= 'column_' . $ext[1];
+					$method_base	= $ext[1];
+					$method		= 'column_' . $method_base;
 					
 					//trying to load extention
 					$columnWidget = $this->load->widget('RMDesktopEx', $widget);
@@ -145,87 +249,47 @@ class mwRegmgr extends mwController
 				
 			}
 			
-			//check is current column is "head" - <th>
-			if ( !empty($cfgVal['class']) and strpos($cfgVal['class'], 'head') != -1 ) {
-			
-				$cellWrap = 'th';
-				
-			}
-			else {
-				
-				$cellWrap = 'td';
-				
-			}
-			
-			//generate and push table header
-			$tableHeads[] = '<' . $cellWrap . '>' . $cfgVal['label'] . '</' . $cellWrap . '>';
-			
-			//prepare column data
-			foreach($rows as $rowKey => $rowVal) {
-				
-				//init columns array
-				if ( !isset($rows[$rowKey]) )
-					$rows[$rowKey]['RMColumns'] = [];
-				
-				//generate cell html
-				$cellHtml = call_user_func( [$columnWidget, '_ob_' . $method], $cfgKey, $rowVal, $cfgVal );
-				
-				//wrap template on in cell tag
-				$cellHtml = '<' . $cellWrap . '>' . $cellHtml . '</' . $cellWrap . '>';
-				
-				//generate column html
-				$rows[$rowKey]['RMColumns'][] = $cellHtml;
-				
-			}
+			//init widget
+			$widgetsList[$cfgKey] = [];
+			$widgetsList[$cfgKey]['widget'] = $columnWidget;
+			$widgetsList[$cfgKey]['method'] = $method;
+			$widgetsList[$cfgKey]['method_base'] = $method_base;
 			
 		}
 		
-		$this->loadContent('table', 'index', array(
-			'heads' => $tableHeads,
-			'rows' => $rows
-		));
+		return $widgetsList;
 		
-	} //FUNC _renderIndex
+	} //FUNC _getColumnWidgets
 	
 	function _getBarHtml() {
 		
 		//get sorting config data
-		$sortingCFG = rmCfg()->getBranch('core', 'sorting');
-		
+		$sortingCFG = rmCfg()->getSorting();
 		//__($sortingCFG);
 		
+		//generate sorting select
 		$html = '';
+		$html .= '<select id="regmgr_sorting">';
 		
-		if ( !empty($sortingCFG) ) {
+		foreach( $sortingCFG as $v )
+			$html .= '<option value="' . $v['value'] . '">' . $v['title'] . '</option>';
+		
+		$html .= '</select>';
+		
+		//get filters data
+		$filterCFG = rmCfg()->getBranch('core', 'filter');
+		//__($filterCFG);
+		
+		//get column widgets list
+		$columnList = $this->_getColumnWidgets($filterCFG);
+		//__($columnList);
+		
+		//loop column list and call widgets to filter data
+		foreach( $columnList as $k => $v ) {
 			
-			$html .= '<select id="regmgr_sorting">';
-			
-			//get default sorting text not in loop to make it always on top
-			$default = 'Order By';
-			if ( !empty($sortingCFG['default']) ) {
-				
-				$exp = explode('|', $sortingCFG['default']);
-				//2nd part is display for select
-				if ( !empty($exp[1]) ) $default = trim($exp[1]);
-				
-				//remove from array to generate others
-				unset($sortingCFG['default']);
-				
-			}
-			
-			//generate default option
-			$html .= '<option value="">' . $default . '</option>';
-			
-			foreach( $sortingCFG as $sortKey => $sortVal ) {
-				
-				$exp = explode('|', $sortVal);
-				
-				//2nd part is display for select
-				if ( !empty($exp[1]) )
-					$html .= '<option value="' . $sortKey . '">' . trim($exp[1]) . '</option>';
-				
-			}
-			
+			//generate cell html
+			$html .= '<select id="' . $k . '" class="regmgr_filter">';
+			$html .= call_user_func([$columnList[$k]['widget'], 'renderFilter'], $filterCFG[$k]);
 			$html .= '</select>';
 			
 		}

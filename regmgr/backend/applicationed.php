@@ -50,7 +50,7 @@ class mwApplicationEd extends mwEditor {
 			$this->type = $_REQUEST['type'];
 
 		} //IF type is provided
-
+		__(333);
 		parent::__init();
 
 	} //CONSTRUCTOR
