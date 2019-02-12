@@ -72,8 +72,6 @@ class mwRMDesktopEx extends mwWidget
 	
 	function filter_status($rows, $cfg, $filter) {
 		
-		__($cfg, $value);
-		
 		//check is some rows exitst
 		//check is filter not empty
 		//check is filter key status
