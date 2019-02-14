@@ -1,6 +1,6 @@
 <?php
 
-class mwRegMgrInit extends mwSectionInit {
+class mwRegmgrInit extends mwSectionInit {
 
 	public	$Title		= 'RegMgr';
 	public 	$Description	= 'Registration Manager';
@@ -10,4 +10,4 @@ class mwRegMgrInit extends mwSectionInit {
 		'reviewer' 	=> array('Reviewer User', FALSE)
 	);
 
-} //CLASS mwRegMgrInit
+} //CLASS mwRegmgrInit
