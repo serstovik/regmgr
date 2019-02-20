@@ -123,7 +123,7 @@ class rmCfg extends vObject {
 			foreach($listCfg as $k => $v ) {
 				
 				if ( !in_array($k, $major) )
-					$result[$v] = $v;
+					$result[$k] = $v;
 				
 			}
 			

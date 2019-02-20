@@ -119,7 +119,19 @@ class mwApplicationEd extends mwEditor {
 		// If there where validation issues - need to throw this as exception
 		if ( $v )
 			throw( new mwValidationEx('Wrong info provided.', $v, $this->EditorName) );
-
+		
+		//load old data from DB
+		$this->Item->loadByID($data['id']);
+		
+		//add flag to send email on major status change
+		if ( $data['status_major'] != $this->Item->statusMajor )
+			$this->emailMajor = true;
+		
+		
+		//add flag to send email on minor status change
+		if ( $data['status_minor'] != $this->Item->statusMinor )
+			$this->emailMinor = true;
+		
 		return $data;
 		
 	} //FUNC onValidate
@@ -146,8 +158,15 @@ class mwApplicationEd extends mwEditor {
 				
 		} //FOR each extension
 		
-		//trigger status event
-		(new mwEvent('regmgr.status.' . $this->Item->statusMajor))->trigger($this->Item);
+		__($this->emailMajor, $this->emailMinor);
+		
+		//trigger major status event
+		if ( $this->emailMajor )
+			(new mwEvent('regmgr.status.' . $this->Item->statusMajor))->trigger($this->Item);
+		
+		//trigger major status event
+		if ( $this->emailMinor )
+			(new mwEvent('regmgr.status.' . $this->Item->statusMinor))->trigger($this->Item);
 		
 	//	$this->loadWindow();
 		
