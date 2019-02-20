@@ -80,13 +80,6 @@ class mwRMDesktopEx_core extends mwRMDesktopEx {
 			
 	} //FUNC column_date
 	
-	function renderFilter($cfg) {
-		//__($cfg);
-		
-		
-		
-	} //FUNC renderFilter
-	
 	function filter_status($rows, $cfg, $filter = false) {
 		
 		//__($cfg, $value);
@@ -94,13 +87,14 @@ class mwRMDesktopEx_core extends mwRMDesktopEx {
 		//check is options list required
 		if ( !$filter ) {
 			
-			$statuses = rmCfg()->getStatuses();
+			$statuses = rmCfg()->getStatuses($cfg['type']);
 			//__($statuses);
 			
-			$options = '<option value="">Filter By Status</option>';
+			$options = [];
+			$options['default'] = $cfg['label'];
 			
 			foreach( $statuses as $k => $v )
-				$options .= '<option value="' . $k . '">' . $v . '</option>';
+				$options[$k] = $v;
 			
 			return $options;
 			
@@ -111,8 +105,8 @@ class mwRMDesktopEx_core extends mwRMDesktopEx {
 			//check is some rows exitst
 			//check is filter not empty
 			//check is filter key status
-			//check is filter value not empty
-			if ( !empty($rows) && !empty($filter) && $filter['key'] == 'status' && !empty($filter['value']) ) {
+			//check is filterValue not default
+			if ( !empty($rows) && !empty($filter) && $filter['key'] == 'status' && $filter['value'] != 'default' ) {
 				
 				//loop rows and filter by status value 
 				foreach( $rows as $k => $v ) {

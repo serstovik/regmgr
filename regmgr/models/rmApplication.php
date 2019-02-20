@@ -1,12 +1,4 @@
 <?php
-define('RM_STATUS_NEW', 'new');
-define('RM_STATUS_OPEN', 'open');
-define('RM_STATUS_SUBMIT', 'submit');
-define('RM_STATUS_READY', 'ready');
-define('RM_STATUS_APPROVED', 'approved');
-define('RM_STATUS_DECLINED', 'declined');
-define('RM_STATUS_CLOSED', 'closed');
-
 /** //** ----= CLASS rmApplication	=------------------------------------------------------------------------------\**//** \
  *
  * 	Base regMgr application DB model.
@@ -18,7 +10,7 @@ define('RM_STATUS_CLOSED', 'closed');
 \**//** ------------------------------------------------------------------------= by SerStoVik @ Morad Media Inc. =----/** //**/
 class rmApplication extends vDBObject {
 
-	public $statusList		= [RM_STATUS_NEW, RM_STATUS_OPEN, RM_STATUS_SUBMIT, RM_STATUS_READY, RM_STATUS_APPROVED, RM_STATUS_DECLINED, RM_STATUS_CLOSED];
+	public $statusList		= [];
 
 // ---- SETTINGS ----
 
@@ -71,7 +63,10 @@ class rmApplication extends vDBObject {
 
 		// Generating new SN
 		$this->sn	= newSN('A');
-
+		
+		//get major statuses
+		$this->statusList = rmCfg()->getStatuses();
+		
 		// Initiating self from type template
 		$this->init();
 

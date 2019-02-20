@@ -67,6 +67,19 @@ var rmApplicationAdmin		= function ($el) {
 
 		}); //FUNC each.row
 		
+		//init sorting select
+		jQuery('#regmgr_sorting').off().change(function(e){
+			
+			var el = jQuery(this);
+			
+			mwAjax(RM_BACKEND_AJAX + '/index', {'sorting' :  el.val()} )
+				.go()
+				.success( function($data) {} )
+				.error( function() {} )
+			; // mwAjax
+			
+		});
+		
 		//init filter select
 		jQuery('.regmgr_filter').off().change(function(e){
 			

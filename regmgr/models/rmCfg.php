@@ -97,9 +97,39 @@ class rmCfg extends vObject {
 
 	} //FUNC getTypes
 
-	function getStatuses ($status = '') {
-
-		return $this->getBranch('statuses', $status);
+	function getStatuses ($status = 'major') {
+		
+		//define major statuses
+		$major = ['new', 'open', 'submit', 'ready', 'approved', 'declined', 'closed'];
+		
+		$listCfg = $this->getBranch('statuses');
+		
+		$result = [];
+		
+		if ( $status == 'both' || $status == 'major' ) {
+			
+			foreach($major as $k => $v ) {
+				
+				if ( !empty( $listCfg[$v] ) )
+					$result[$v] = $listCfg[$v];
+				else
+					$result[$v] = $v;
+				
+			}
+		}
+		
+		if ( $status == 'both' || $status == 'minor' ) {
+			
+			foreach($listCfg as $k => $v ) {
+				
+				if ( !in_array($k, $major) )
+					$result[$v] = $v;
+				
+			}
+			
+		}
+		
+		return $result;
 
 	} //FUNC getStatuses
 

@@ -59,6 +59,7 @@ class mwRegmgr extends mwController
 			$_SESSION['regmgr']['list_options']['sorting'] = $_POST['sorting'];
 		
 		$rows = $this->app->getList($_SESSION['regmgr']['list_options']);
+		
 		//set list_options filter
 		if ( !empty( $_POST['filterKey'] ) ) {
 		
@@ -78,14 +79,19 @@ class mwRegmgr extends mwController
 		$columnList = $this->_getColumnWidgets($filterCFG);
 		//__($columnList);
 		
-		//loop column list and call widgets to filter data
-		foreach( $columnList as $k => $v ) {
+		//no need to filter data if no filter empty
+		if ( !empty($_SESSION['regmgr']['list_options']['filter']) ) {
 			
-			//generate cell html
-			$rows = call_user_func(
-				[$columnList[$k]['widget'], 'filter_' . $columnList[$k]['method_base']],
-				$rows, $filterCFG[$k], $_SESSION['regmgr']['list_options']['filter']
-			);
+			//loop column list and call widgets to filter data
+			foreach( $columnList as $k => $v ) {
+				
+				//generate cell html
+				$rows = call_user_func(
+					[$columnList[$k]['widget'], 'filter_' . $columnList[$k]['method_base']],
+					$rows, $filterCFG[$k], $_SESSION['regmgr']['list_options']['filter']
+				);
+				
+			}
 			
 		}
 		
@@ -96,7 +102,7 @@ class mwRegmgr extends mwController
 		if ( $this->isAjax )
 			return;
 		
-		$this->load->editor('applicationEd', ['item' => $this->app])->loadJS();
+		//$this->load->editor('applicationEd', ['item' => $this->app])->loadJS();
 		
 		$section = 'Register Manager';
 		
@@ -285,9 +291,14 @@ class mwRegmgr extends mwController
 		//loop column list and call widgets to filter data
 		foreach( $columnList as $k => $v ) {
 			
+			$optionsList = call_user_func(
+					[$columnList[$k]['widget'], 'filter_' . $columnList[$k]['method_base']],
+					$rows, $filterCFG[$k], false
+				);
+			
 			//generate cell html
 			$html .= '<select id="' . $k . '" class="regmgr_filter">';
-			$html .= call_user_func([$columnList[$k]['widget'], 'renderFilter'], $filterCFG[$k]);
+			foreach( $optionsList as $k => $v ) $html .= '<option value="' . $k . '">' . $v . '</option>';
 			$html .= '</select>';
 			
 		}
