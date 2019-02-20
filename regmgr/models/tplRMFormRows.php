@@ -115,7 +115,28 @@ class tplRMFormRows extends vTpl2 {
 		// Checking if source row given
 		$isSource	= $key === true;
 
-		// ToDo: prefill form inputs from data
+		// Prefilling inputs will data
+		// Doing only for non-source rows, when data is present and form is rendered for frontend
+		if ( $row and $key and !$this->backend ) {
+			
+			// Creating new mwForm instance for each row
+			// Not very effective, but forms are really small anyway
+			
+			// Initiating form with node html
+			$html	= $node->html();
+
+			// Prefilling
+			$form	= new mwForm();
+			
+			$form->init($html);
+			$form->Inputs->fromArray($row);
+			$form->setup();
+			$html	= $form->HTML();
+
+			// Returning parsed html back			
+			$node->html($html);
+
+		} //IF need to prefill
 
 		// Preparsing inputs to have correct array format
 		// Have to do it for each individual row, for correct prefill support
@@ -131,7 +152,6 @@ class tplRMFormRows extends vTpl2 {
 
 		// Getting html and outputting
 		$html = $node->html();
-		
 	?>
 		<div class="rmFormRows-row"><?=$html?></div>
 	<?php

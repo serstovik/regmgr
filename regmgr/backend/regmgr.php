@@ -59,8 +59,6 @@ class mwRegmgr extends mwController
 			$_SESSION['regmgr']['list_options']['sorting'] = $_POST['sorting'];
 		
 		$rows = $this->app->getList($_SESSION['regmgr']['list_options']);
-		//__($rows);
-		//__($_POST);
 		//set list_options filter
 		if ( !empty( $_POST['filterKey'] ) ) {
 		

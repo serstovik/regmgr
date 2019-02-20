@@ -80,4 +80,53 @@ class mwRMDesktopEx_core extends mwRMDesktopEx {
 			
 	} //FUNC column_date
 	
+	function renderFilter($cfg) {
+		//__($cfg);
+		
+		
+		
+	} //FUNC renderFilter
+	
+	function filter_status($rows, $cfg, $filter = false) {
+		
+		//__($cfg, $value);
+		
+		//check is options list required
+		if ( !$filter ) {
+			
+			$statuses = rmCfg()->getStatuses();
+			//__($statuses);
+			
+			$options = '<option value="">Filter By Status</option>';
+			
+			foreach( $statuses as $k => $v )
+				$options .= '<option value="' . $k . '">' . $v . '</option>';
+			
+			return $options;
+			
+		}
+		//return sql where conditions
+		else {
+			
+			//check is some rows exitst
+			//check is filter not empty
+			//check is filter key status
+			//check is filter value not empty
+			if ( !empty($rows) && !empty($filter) && $filter['key'] == 'status' && !empty($filter['value']) ) {
+				
+				//loop rows and filter by status value 
+				foreach( $rows as $k => $v ) {
+					
+					if ( $v['status_major'] != $filter['value'] && $v['status_minor'] != $filter['value'] )
+						unset($rows[$k]);
+					
+				}
+			}
+			
+		}
+		
+		return $rows;
+		
+	} //FUNC filterStatus
+	
 } //CLASS mwRMDesktopEx_core

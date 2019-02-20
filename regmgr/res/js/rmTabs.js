@@ -164,16 +164,15 @@ var rmTabs		= function ($el, $options) {
 
 	// ---- Current ----
 
-		// Looking for current item, to have correct information for children
-		$this.setCurrent($this.dom.controls.filter(':checked'));
-
-		// Triggering init event
-		$this.onInit($this);
-
 		// Switching tab to current after small timeout
 		// This make sure all initial stuff is rendered
 		setTimeout( function () {
-			$this.switchTab( $this.current.button );
+			
+			$this.switchTab( $this.dom.controls.filter(':checked').next() );
+
+			// Triggering init event
+			$this.onInit($this);
+
 		}, 10 );
 
 		return $this;
@@ -219,6 +218,10 @@ var rmTabs		= function ($el, $options) {
 	switchTab	: function ($el, $click) {
 		
 		var $this = this;
+
+		// Not doing anything if same button clicked
+		if ( $this.current.button && $el.is($this.current.button) )
+			return;
 
 		// Triggering leave event first, passing current tab stuff
 		// Skipping when there is no current though

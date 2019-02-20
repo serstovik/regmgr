@@ -55,10 +55,10 @@ class mwSystemEvent_regmgrMailer extends mwSystemEvent {
 					//__($user);
 					if ( is_array($user) )
 						$data = array_merge($user, $data);
-					//__($data);
+
 					$file = compilePath(SITE_TEMPLATES_PATH, 'regmgr/emails', $v['template']);
-					//$body = loadView($file, $data);
-					$body = loadView($file, []);
+					$body = loadView($file, $data);
+					//$body = loadView($file, []);
 					
 					$body = (new vTpl2($body))->parse()->vars($data)->html();
 					
