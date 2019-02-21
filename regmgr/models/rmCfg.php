@@ -1,4 +1,19 @@
 <?php
+//define statuses scopes (types)
+define('RM_STATUS_SCOPE_NONE',	'none');
+define('RM_STATUS_SCOPE_MAJOR',	'major');
+define('RM_STATUS_SCOPE_MINOR',	'minor');
+define('RM_STATUS_SCOPE_BOTH',	'both');
+
+//define statuses
+define('RM_STATUS_NEW',		'new');
+define('RM_STATUS_OPEN',	'open');
+define('RM_STATUS_SUBMIT',	'submit');
+define('RM_STATUS_READY',	'ready');
+define('RM_STATUS_APPROVED',	'approved');
+define('RM_STATUS_DECLINED',	'declined');
+define('RM_STATUS_CLOSED',	'closed');
+
 /** //** ----= CLASS rmCfg	=--------------------------------------------------------------------------------------\**//** \
  *
  *	RegMgr config helper.
@@ -97,39 +112,85 @@ class rmCfg extends vObject {
 
 	} //FUNC getTypes
 
-	function getStatuses ($status = 'major') {
+	function getStatuses ($status = '', $scope = RM_STATUS_SCOPE_BOTH) {
 		
 		//define major statuses
-		$major = ['new', 'open', 'submit', 'ready', 'approved', 'declined', 'closed'];
+		static $major = [
+			RM_STATUS_NEW		=> 'New',
+			RM_STATUS_OPEN		=> 'Open',
+			RM_STATUS_SUBMIT	=> 'Submit',
+			RM_STATUS_READY		=> 'Ready',
+			RM_STATUS_APPROVED	=> 'Approved',
+			RM_STATUS_DECLINED	=> 'Declined',
+			RM_STATUS_CLOSED	=> 'Closed'
+		];
 		
-		$listCfg = $this->getBranch('statuses');
+		static $statuses;
 		
-		$result = [];
+		//loading statuses from config if necesssary
+		if ( empty($statuses) )
+			$statuses = array_merge($major, $this->getBranch('statuses'));
 		
-		if ( $status == 'both' || $status == 'major' ) {
+		//return all statuses
+		if ( !$status && $scope == RM_STATUS_SCOPE_BOTH )
+			return $statuses;
+		
+		//status not empty - checking against scope and returning caption
+		if ( $status ) {
 			
-			foreach($major as $k => $v ) {
-				
-				if ( !empty( $listCfg[$v] ) )
-					$result[$v] = $listCfg[$v];
-				else
-					$result[$v] = $v;
-				
-			}
-		}
-		
-		if ( $status == 'both' || $status == 'minor' ) {
+			//if no such status exists - return false
+			if (  !array_key_exists($status, $statuses) )
+				return false;
 			
-			foreach($listCfg as $k => $v ) {
-				
-				if ( !in_array($k, $major) )
-					$result[$k] = $v;
-				
-			}
+			//if scope both - just return current status lable
+			if ( $scope == RM_STATUS_SCOPE_BOTH )
+				return $statuses[$status];
 			
-		}
-		
-		return $result;
+			//checking is status belong to given scope
+			//if current status belong to major scope
+			if ( array_key_exists($status, $major) ) {
+				
+				if ( $scope == RM_STATUS_SCOPE_MAJOR )
+					return $statuses[$status];
+				
+			}//status belong to major scope
+			else {
+				
+				if ( $scope == RM_STATUS_SCOPE_MINOR )
+					return $statuses[$status];
+				
+			}//status belong to minor scope
+			
+			//no match found
+			return false;
+			
+		}// if status not empty
+		else {
+			
+			$result = [];
+			
+			//loop statuses list and return only required by scope statuses
+			foreach($statuses as $k => $v ) {
+				
+				//check if current status is major
+				if ( array_key_exists($k, $major) ) {
+					
+					if ( $scope == RM_STATUS_SCOPE_MAJOR )
+						$result[$k] = $v;
+					
+				}// current status is major
+				else {
+					
+					if ( $scope == RM_STATUS_SCOPE_MINOR )
+						$result[$k] = $v;
+					
+				}//current status is minor
+				
+			}//loop statuses
+			
+			return $result;
+			
+		} //stastus is empty
 
 	} //FUNC getStatuses
 

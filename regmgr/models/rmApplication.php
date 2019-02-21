@@ -65,7 +65,7 @@ class rmApplication extends vDBObject {
 		$this->sn	= newSN('A');
 		
 		//get major statuses
-		$this->statusList = rmCfg()->getStatuses();
+		$this->statusList = rmCfg()->getStatuses('', RM_STATUS_MAJOR);
 		
 		// Initiating self from type template
 		$this->init();

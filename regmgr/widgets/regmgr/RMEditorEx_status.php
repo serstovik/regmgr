@@ -14,40 +14,10 @@ class mwRMEditorEx_status extends mwRMEditorEx
 		
 		//$this->load->model('rmCfg'); // how to load lib?
 		
-		$statuses = rmCfg()->getStatuses();
+		$statusesMajor = rmCfg()->getStatuses('', RM_STATUS_SCOPE_MAJOR);
+		$statusesMinor = rmCfg()->getStatuses('', RM_STATUS_SCOPE_MINOR);
 		
-		//default statuses names
-		$coreDefault = [
-			'new'		=> 'New',
-			'open'		=> 'Open',
-			'submit'	=> 'Submit',
-			'ready'		=> 'Ready',
-			'approved'	=> 'Approved',
-			'declined'	=> 'Declined',
-			'closed'	=> 'Closed',
-		];
-		
-		foreach($coreDefault as $k => $v){
-			
-			//check is core status exists in config
-			if ( !empty($statuses[$k]) ) {
-				
-				//use caption from config
-				$coreList[$k] = $statuses[$k];
-				
-				//remove core status from config list
-				unset($statuses[$k]);
-				
-			}
-			else {
-				
-				//use default caption
-				$coreList[$k] = $coreDefault[$k];
-				
-			}
-		}
-		
-		$statuses = array_merge([0 => 'Select Status'], $statuses);
+		$statusesMinor = array_merge([0 => 'Select Status'], $statusesMinor);
 		//__($statuses);
 		
 		?>
@@ -83,7 +53,7 @@ class mwRMEditorEx_status extends mwRMEditorEx
 				
 				var text = jQuery('#regmgr_approve_text');
 				
-				var statuses = <?=json_encode($coreList)?>;
+				var statuses = <?=json_encode($statusesMajor)?>;
 				
 				text.html(statuses[val]);
 					

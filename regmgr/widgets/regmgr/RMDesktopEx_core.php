@@ -87,7 +87,7 @@ class mwRMDesktopEx_core extends mwRMDesktopEx {
 		//check is options list required
 		if ( !$filter ) {
 			
-			$statuses = rmCfg()->getStatuses($cfg['type']);
+			$statuses = rmCfg()->getStatuses('', $cfg['type']);
 			//__($statuses);
 			
 			$options = [];
