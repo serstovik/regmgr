@@ -221,6 +221,10 @@ class tplApplication extends vTpl2 {
 
 		if ( $this->backend )
 			return false;
+		
+		// No need to render save buttons if application is went out of open state
+		if ( !in_array($this->application->statusMajor, [RM_STATUS_NEW, RM_STATUS_OPEN]) )
+			return false;
 
 		// Adding prefix class to button
 		// Which will be used by JS to initialize
@@ -231,7 +235,8 @@ class tplApplication extends vTpl2 {
 	} //FUNC renderAction_save
 
 	function renderAction_submit ($node) {
-
+		
+		
 		if ( $this->backend )
 			return false;
 
