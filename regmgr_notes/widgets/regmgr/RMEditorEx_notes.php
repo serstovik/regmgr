@@ -41,7 +41,7 @@
 				
 				$notesHtml	.= '<br/>';
 
-				$notesHtml	.= '<div class="rmnotes-update-section '.$note['id'].'"><textarea name="update_note_'.$note['id'].'"></textarea></div>';
+				$notesHtml	.= '<div class="rmnotes-update-section '.$note['id'].'"><textarea name="update_note_'.$note['id'].' style="height: auto;""></textarea></div>';
 
 				//$notesHtml	.= '<button rel="'.$note['id'].'" class="rmnotes-edit-btn '.$note['id'].'">Update</button>';
 				//$notesHtml	.= '<button rel="'.$note['id'].'" class="rmnotes-remove-btn">Remove</button>';
@@ -63,7 +63,7 @@
 		<dl class="mwDialog">
 
 			<dt>Add Note:</dt>
-			<dd><textarea name="admin_notes" rows="3" style="height: 50px;" value=""></textarea></dd>
+			<dd><textarea name="admin_notes" rows="5" style="height: 100px; value=""></textarea></dd>
 <?php
 			/*
 			<button rel="<?=$appId?>" class="regmgr-submit-note">Add</button>

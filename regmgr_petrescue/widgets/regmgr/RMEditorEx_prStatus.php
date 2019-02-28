@@ -12,42 +12,10 @@ class mwRMEditorEx_prStatus extends mwRMEditorEx_status
 		
 		//__($this->application->extensions['eShop']['items']);
 		
-		$statuses = rmCfg()->getStatuses();
-		//__($this->cfg);
-		//$cfg = rmCfg()->getBranch('backend', 'editor');
+		$statusesMajor = rmCfg()->getStatuses('', RM_STATUS_SCOPE_MAJOR);
+		$statusesMinor = rmCfg()->getStatuses('', RM_STATUS_SCOPE_MINOR);
 		
-		//default statuses names
-		$coreDefault = [
-			'new'		=> 'New',
-			'open'		=> 'Open',
-			'submit'	=> 'Submit',
-			'ready'		=> 'Ready',
-			'approved'	=> 'Approved',
-			'declined'	=> 'Declined',
-			'closed'	=> 'Closed',
-		];
-		
-		foreach($coreDefault as $k => $v){
-			
-			//check is core status exists in config
-			if ( !empty($statuses[$k]) ) {
-				
-				//use caption from config
-				$coreList[$k] = $statuses[$k];
-				
-				//remove core status from config list
-				unset($statuses[$k]);
-				
-			}
-			else {
-				
-				//use default caption
-				$coreList[$k] = $coreDefault[$k];
-				
-			}
-		}
-		
-		$statuses = array_merge([0 => 'Select Status'], $statuses);
+		$statusesMinor = array_merge([0 => 'Select Status'], $statusesMinor);
 		//__($statuses);
 		
 		// Decoding items data
@@ -81,15 +49,15 @@ class mwRMEditorEx_prStatus extends mwRMEditorEx_status
 				</td></tr>
 				<?php endif; ?>
 				<tr><td>
-					<input hint="Approve application" class="Hi full cell-60 approve-btn" type="button" value="Approve" onClick="regmgr_update_approve('approved')" />
-					<input hint="Decline application" class="Red full cell-40" type="button" value="Decline" onClick="regmgr_update_approve('declined');"/>
+					<input hint="Approve application" class="Hi full approve-btn" type="button" value="Adopted" onClick="regmgr_update_approve('approved')" />
+					<!--input hint="Decline application" class="Red full cell-40" type="button" value="Decline" onClick="regmgr_update_approve('declined');"/-->
 					<!--input id="regmgr_approval_value" type="hidden" name="approval_value" /-->
 				</td></tr>
-				<?php if( sizeof($statuses) > 1 ):?>
+				<?php if( sizeof($statusesMinor) > 1 ):?>
 				<tr><th>Application Status:</th></tr>
 				<tr><td>
 					<select name="status_minor" id="regmgr_minor_status" onChange="jQuery('[name=status_minor]').val(jQuery(this).val());">
-					<?foreach($statuses as $k => $v):?>
+					<?foreach($statusesMinor as $k => $v):?>
 						<option value="<?=$k?>"><?=$v?></option>
 					<?endforeach;?>
 					</select>
@@ -108,7 +76,7 @@ class mwRMEditorEx_prStatus extends mwRMEditorEx_status
 				
 				var text = jQuery('#regmgr_approve_text');
 				
-				var statuses = <?=json_encode($coreList)?>;
+				var statuses = <?=json_encode($statusesMajor)?>;
 				
 				text.html(statuses[val]);
 				
