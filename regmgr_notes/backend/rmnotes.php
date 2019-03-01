@@ -10,7 +10,7 @@
 class mwRmNotes extends mwController {
 
 	function addNote(){
-		
+
  		if (!isset($_POST['appId']) || empty($_POST['appId']))
  			return false;
 
@@ -27,14 +27,13 @@ class mwRmNotes extends mwController {
 
  		$notesData	= ['app_id' => $appId, 'user_id' => $userId, 'text' => $text];
 		$res 		= $RMNotes->fromArray($notesData)->toDB();
-
+		
 		//$wgt	= mwLoad('regmgr')->widget('RMEditorEx', 'notes');
 		//return $wgt->editor_notes($appId);
-		//__($wgt);
-
+	
 		//return data to js
-		if (isset($res->id))
-			return $RMNotes->getNoteById($res->id);
+		if (isset($res->ID))
+			return $RMNotes->getNoteById($res->ID);
 
 	} //FUNC updateNote
 
