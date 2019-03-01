@@ -20,14 +20,8 @@ var rmApplication	= function ($options) {
 
 		actions		: false,		// Action inputs
 
-		loader		: false,	// Form loader
+		loader		: false,		// Form loader
 		status		: false,		// Form status
-
-		tabs		: {			// Tabs elements
-			wrap		: false,		// Tabs buttons wrapper
-			buttons		: false,		// Tabs buttons
-			contents	: false,		// Tabs contents
-		}, //tabs
 
 	}, // dom
 
@@ -149,8 +143,8 @@ var rmApplication	= function ($options) {
 				//simulation for localhost
 				setTimeout(function() {
 				
-				//disable loader
-				$this.dom.loader.hide();
+					//disable loader
+					$this.dom.loader.hide();
 				
 				}, 1000);
 			
@@ -160,6 +154,10 @@ var rmApplication	= function ($options) {
 				
 				//show thanks message
 				$this.dom.form.html($this.thank_you);
+
+				// Redirecting to specified URL if one specified
+				if ( $data.redirect )
+					window.location.href = $data.redirect;
 				
 			}) //FUNC success
 

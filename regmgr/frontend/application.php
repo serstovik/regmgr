@@ -6,10 +6,13 @@
  *\**//** --------------------------------------------------------------= by SerStoVik @ Morad Media Inc.	=------/** //**/
 class mwApplication extends mwController {
 
-	public	$wgt		= false;
+
 	public	$AutoIndex	= true;		// Allow or not redirect unknown methods to index.
 
-	public $config		= false;
+	public	$page		= false;	// |- Stores source page and widget objects  
+	public	$wgt		= false;	// |
+	
+	public	$config		= false;
 
 	function __init	() {
 
@@ -32,7 +35,7 @@ class mwApplication extends mwController {
 
 	// ---- Models and resources ----
 	
-		// Loading App model models
+		// Loading App model
 		$this->load->model('rmApplication');
 
 		// Loading required resources
@@ -139,7 +142,10 @@ class mwApplication extends mwController {
 		if ( empty($_POST['form']) or !isSN($_POST['form'], 'F') )
 			throw( new Exception('Invalid source form.') );
 
-	// ---- Models ----
+		// Using flag to trigger immediate payment if enabled
+		$isPayment = false;
+
+	// ---- Model ----
 
 		// Loading involved models
 		$this->load->model('rmApplication');
@@ -147,7 +153,15 @@ class mwApplication extends mwController {
 		// Creating and initializing main model
 		$app = new rmApplication($_POST['type']);
 
-	// ---- POST and FLES ----
+		// If application have ID - loading it
+		// This allows partial updates and status checks
+		if ( !empty($_POST['id']) or !isID($_POST['id']) ) {
+			
+			$app->loadByID($_POST['id']);
+			
+		} //IF ID provided
+
+	// ---- POST and FILES ----
 
 		// Validating general application inputs
 		if ( $v = $app->validate($_POST) )
@@ -170,38 +184,290 @@ class mwApplication extends mwController {
 		// Making sure table is up to date
 		$app->createTable()->updateTable();
 		
-		//check is submit button was clicked
+		// Filling app with data and saving to get ID
+		$app->fromArray($_POST);
+
+		// Finally saving application into DB
+		$app->toDB();
+	
+	// ---- States ----		
+
+		// At this point - ID is defined... or something went horrobly wrong, which raised exceptions above
+		
+		// Chekcing if application is submitted
+		// Processing each state separately, for better controll
 		if ( !empty($_POST['submit']) && $_POST['submit'] == '1' ) {
 			
-			//change status to submit only for new or saved apps
+			// Submit is set only for new or opened applications
 			if ( empty($this->statusMajor) or in_array($this->statusMajor, [RM_STATUS_NEW, RM_STATUS_OPEN]) ) {
-			
-				$app->statusMajor = RM_STATUS_SUBMIT;
 
-			}//change status to submit
+				// Setting submit status and triggering it
+				$app->setStatus(RM_STATUS_SUBMIT);
+				
+			// ---- Payment -----	
+				
+				// Checking if payment is enabled
+				$payCfg	= rmCfg()->getTypes($app->type, 'payment');
+				
+				// If payment is enabled - keeping app in submit status, 
+				// and adding redirect if immediate payment is set
+				// Otherwise setting to ready state right here 
+				if ( !empty($payCfg['enabled']) ) {
 
-		}// submit button clicked
-		//submit != 1 - save and return clicked
+					// ToDo: should calculate amount here
+					
+					// If payment is on after submit - need to add redirect
+					if ( $payCfg['enabled'] == 'onSubmit' ) {
+						
+						// Redirecting to payment page
+						$this->addAjax('redirect', '/'.$this->page->Name.'/application/payment/'.$app->id);
+						
+					} //IF payment is enabled on submit
+					
+				} //IF payment is enabled
+				else {
+
+					// Without payemnt setting ready status right away
+					$app->setStatus(RM_STATUS_READY);
+					
+				} //IF no payment enabled
+
+			} //change status to submit
+
+		} //IF submit button clicked
+		
 		else {
-			
-			$app->statusMajor = RM_STATUS_OPEN;
-			
-		}
-		
-		//$app->loadById();
-		
-		
-		//trigger before save
 
-		// And saving data into DB
-		$app->fromArray($_POST)->toDB();
-		
-		//triger after save
-	//	$this->addAjax('resultMessage', $msg);
-	//	__($app);
-		(new mwEvent('regmgr.status.' . $app->statusMajor))->trigger($app);
+			// Just setting open state 			
+			$app->setStatus(RM_STATUS_OPEN);
+			
+		} //IF simple save
+
+	// ---- Result ----
 		
 	} //FUNC save
+
+	function payment ($id = 0) {
+
+		// Loading payment related stuff
+		list($app, $cfg, $amount) = $this->_getPaymentCommons($id);
+
+	// ---- Resources ----
+
+		// Loading system resources
+		// System for ajax, forms for form styles and auth.js for handy JS submit wrapper
+		mwLoad('system')
+			->resource('mw.system', 'mw.forms')
+			->java('block.auth.js')
+		; //mwLoad
+		
+	// ---- Template ----	
+
+		// Using SN to mark the form
+		$sn		= newSN('RM');
+
+		// Loading template html, passing some interesting values		
+		$vData	= [
+			'app'		=> $app,
+			'cfg'		=> $cfg,
+			'wgt'		=> $this->wgt,
+			'amount'	=> $amount,
+		]; //$vData		
+
+		$file	= compilePath($this->SectionName, 'payments', $cfg['template']);
+		$html	= $this->load->template($file, $vData);
+
+		if ( !$html )
+			throw( new Exception('Payment template is not provided.') );
+
+		// Using inline TPL parsing cuz in rush	
+		$tpl	= new vTpl2($html);
+		
+		// Parsing billing form
+		$tpl->parse()->section('billingForm', function ($node) {
+
+			// Loading billing form and required resources
+			mwLoad('ecomm')->model('essentials');
+			mwLoad('ecomm')->model('funds');
+			
+			$file	= compilePath('payments/gates', $this->wgt->service.'.php');
+			$billingForm	= $this->load->template( $file );
+			
+			if ( empty($billingForm) )
+				throw( new Exception('Billing form is not provided.') );
+			
+			return $billingForm;
+		}); //FUNC parse billingForm
+		
+		// Parsing application as vars 
+		$vars	= [
+			'application'	=> array_merge($app->asArray(), ['amount' => $amount]),
+			'user'		=> User::Data(),
+		]; //$vars
+
+		$tpl->parse()->vars($vars);
+		
+		// Getting html back and rendering form
+		$html	= $tpl->html();
+	
+	// ---- FORM ----
+		
+	?>
+		<form id="<?=$sn?>" method="post" action="/ajax/regmgr/application/paymentSubmit" onsubmit="return mwAuth.submitForm(this, 0)">
+		
+			<input type="hidden" name="id" value="<?=$app->id?>" />
+			<input type="hidden" name="xtoken" value="<?=getToken()?>" />
+		
+			<input type="hidden" name="page" value="<?=$this->wgt->Page->ID?>" />
+			<input type="hidden" name="widget" value="<?=$this->wgt->ID?>" />
+			<input type="hidden" name="form" value="<?=$sn?>" />
+			
+		<?php	if ( !empty($cfg['customAmount']) ) { ?>
+		
+				<input type="hidden" name="amount" value="<?=$amount?>" />
+		
+		<?php	} //IF custom amount is allowed ?>
+			
+			<?=$html?>
+			
+		</form>
+
+		<script type="text/javascript">
+
+			jQuery( function () {
+
+			// ---- Init ----
+
+				setTimeout( function () {
+					styleDialog('#<?=$sn?> .Dialog');
+				}, 1 );
+				
+			}); // jQuery.onLoad
+
+		</script>
+
+	<?php	
+	} //FUNC payment
+	
+	function paymentSubmit () {
+
+	// ---- Validating ----
+	
+		// Making sure application ID is set
+		if ( empty($_POST['id']) or !isID($_POST['id']) )
+			throw( new Exception('Invalid applicaiton specified.') );
+
+		$id	= (int)$_POST['id'];
+
+		// Validating form SN
+		if ( empty($_POST['form']) or !isSN($_POST['form'], 'RM') )
+			throw( new Exception('No form specified.') );
+		
+		// ToDo: validate token
+		
+		// Validating and Loading payment related stuff
+		list($app, $cfg, $amount) = $this->_getPaymentCommons($id);
+
+		// Validating and loading page widget for options
+		$this->_initWidget();
+		
+		$wgt	= $this->wgt;
+
+	// ---- User ----
+	
+		$user = User::get();
+		
+	// ---- Amount ----
+	
+		// Checking if custom amount is allowed
+		if ( 
+			!empty($cfg['customAmount'])
+			and isset($_POST['amount']) 
+			and isNumeric($_POST['amount']) 
+		)
+			 $amount	= $_POST['amount'];
+
+		// Fixing amount in post for transaction
+		$_POST['amount'] = $amount;
+
+	//---- Gateway -----
+		
+		mwLoad('services')->model();
+		mwSVC::model('ecomm');
+		$gate = mwService($wgt->service);
+
+		if ( !$gate )
+			throw( new Exception('Failed to load payment service widget') );
+
+		$gate->Form	= $_POST['form'];
+		$gate->Email	= $user->Email;
+
+	// ---- SandBox ----
+
+		// Forcing sandbox mode (resetting whatever was set by service)
+		if ( $wgt->sandbox == '1' )
+			$gate->setCreds('sb');
+		else
+			$gate->setCreds('live');
+
+		// Setting simulation modes if necessary
+		// Defaulting to success untill more complicated simulation modes editor will be implemented 
+
+		$gate->simRequest	= ( $wgt->simRequest ) ? [ECOMM_SIM_SUCCESS] : false;
+		$gate->simResponse	= ( $wgt->simResponse ) ? ECOMM_SIM_SUCCESS : false;
+
+//		$gate->simRequest	= array(ECOMM_SIM_SUCCESS, ECOMM_SIM_BAD_CC);
+//		$gate->simResponse	= ECOMM_SIM_SUCCESS;
+//		$gate->simResponse	= ECOMM_SIM_REC_SUCCESS;
+//		$gate->simResponse	= ECOMM_SIM_BAD_CC;
+
+	// ---- Payment ----
+
+		//transaction options
+		$options = array(
+			'currency' => $wgt->currency,
+		); //$options
+		
+		// Creating transaction based on post
+		$tr = $gate->newTransaction($options)->fromPost($_POST);
+
+		/// Processing poyment		
+		if ( $gate->charge() === FALSE )
+			return FALSE;
+
+		$_POST['transaction'] = $tr->Order->REF;
+
+	// ---- Application ----
+	
+		// Updating application
+		// Preventing save on status, as will save everything later anyway
+		$app
+			->setStatus(RM_STATUS_READY, '', ['save' => false])
+			->amount($amount)
+			->transaction($tr->Order->REF)
+			->toDB()
+		; //$app 
+
+	// ---- Return ----
+	
+		// Adding message and redirect if set
+		$msg	= $wgt->message;
+		$rUrl	= $wgt->redirect;
+		
+		// Validating url to be local
+		if ( !isLocalURL($rUrl) )
+			$rUrl	= '';
+
+		// Message is always present if no redirect
+		// Just replacing entire form with message
+		if ( $msg or !$rUrl)
+			$this->addContent($_POST['form'], $msg ? $msg : '&nbsp;'); 
+	
+		// Also adding redirect
+		if ( $rUrl )
+			$this->addAjax('redirect', $rUrl);
+	
+	} //FUNC paymentSubmit
 
 /* ==== Helpers ============================================================================================================= */
 
@@ -220,23 +486,78 @@ class mwApplication extends mwController {
 		// Using page to get main widget
 		mwLoad('pages')->model();
 
-		$page	= (new mwPage())
+		$this->page	= (new mwPage())
 			->loadById($_POST['page']);
 
 		// Saving widget in self
-		$this->wgt = $page->getWidget($_POST['widget']);
+		$this->wgt = $this->page->getWidget($_POST['widget']);
 
 		// Done.
 		return $this;
 
 	} //FUNC initWidget
 	
-	/*
-	function test () {
+	function _loadApp ($id) {
+		
+		if ( empty($id) or !isID($id) )
+			throw( new Exception('Invalid application specified.') );
 
-		(new mwEvent('regmgr.status.new'))->trigger([]);
+		// Loading App model
+		$this->load->model('rmApplication');
 
-	} //FUNC test
-	*/
+		$app	= new rmApplication();
+
+		// Loading manually, untill proper DB load implemented in model
+		$sql	= "SELECT * FROM {$app->Table} WHERE `id` = {$id} LIMIT 1";
+		$data	= mwDB()->query($sql)->asRow();
+
+		// Completing model initialization if got results
+		if ( empty($data['id']) )
+			throw( new Exception('Invalid application specified.') );
+			
+		$app
+			->type($data['type'])
+			->init()
+			->fromArray($data);
+		
+		return $app;
+		
+	} //FUNC _loadApp
+
+	function _getPaymentCommons ($id) {
+		
+		// Validating and loading application model
+		$app = $this->_loadApp($id);
+
+		// Can pay only for submitted status
+		// ToDo: review necessarity of this check
+		// ToDo: extended status reacion
+		if ( $app->statusMajor != RM_STATUS_SUBMIT )
+			throw( new Exception('Application have incorrect state.') );
+
+		// Checking if payment is enabled for this type and getting base amount
+		$cfg		= rmCfg()->getTypes($app->type, 'payment');
+		
+		if ( empty($cfg) or empty($cfg['enabled']) )
+			throw( new Exception('Application type does not support payments') );
+		
+		$amount		= empty($cfg['amount']) ? 0 : $cfg['amount']; 
+		
+		// Result is optimized for list
+		return [$app, $cfg, $amount];
+		
+	} //FUNC _getPaymentCommons
+	
+	function sb () {
+		
+		$app = $this->_loadApp(30);
+		
+		__($app);
+		
+		$app->setStatus(RM_STATUS_SUBMIT, 'tested');
+		
+		__($app->id, $app->statusMajor);
+		
+	} //FUNC
 	
 }//CLASS mwApplication
