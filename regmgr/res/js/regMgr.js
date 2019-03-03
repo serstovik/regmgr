@@ -9,9 +9,18 @@ var RM_FRONTEND_AJAX = '/ajax/regmgr/application';
  * 	@category	model
  *
  \**//** -----------------------------------------------------------------------= by SerStoVik @ Morad Media Inc. =----/** //**/
+jQuery.fn.rmApplication = function ($options) {
+
+	if ( !this.length )
+		return;
+
+	return this.data('rmApplication').set($options);
+
+} //FUNC rmApplication
+
 var rmApplication	= function ($options) {
 
-	return vEventObject(['onInit', 'onLoad', 'onSave'], {
+	return vEventObject(['onInit', 'onLoad', 'onBeforeSave', 'onSave'], {
 
 	dom		: {			// Set of shortcuts to useful elements
 
@@ -84,6 +93,9 @@ var rmApplication	= function ($options) {
 
 		$el = _jq($options['el']);
 		
+		// Storing self in container for later reuse
+		$el.data('rmApplication', $this);
+		
 		$this.dom.container	= $el;
 		$this.dom.form		= $this.dom.container.find('form');
 
@@ -122,6 +134,10 @@ var rmApplication	= function ($options) {
 	save		: function ($submit) {
 
 		var $this = this;
+
+		// Calling pre-save callbacks, allowing to cancel process if necessary
+		if ( $this.onBeforeSave($this) === false )
+			return;
 
 		// Setting submit flag
 		$this.dom.form.find('[name=submit]').val( $submit ? '1' : '0' );
