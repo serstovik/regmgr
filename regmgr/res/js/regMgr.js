@@ -138,16 +138,19 @@ var rmApplication	= function ($options) {
 			}) //FUNC start
 
 			.stop( function ($data) {
+
+				// Scrolling to top of container
+				// Giving some space above form (for titles/headers)
+				var $delta = 150;
+				jQuery('html, body').animate({
+					scrollTop: $this.dom.container.offset().top - $delta
+				}, 300); //jQuery.animate.options
+				
+				//disable loader
+				$this.dom.loader.hide();
+
 			//	$this.state($action, false);
 				
-				//simulation for localhost
-				setTimeout(function() {
-				
-					//disable loader
-					$this.dom.loader.hide();
-				
-				}, 1000);
-			
 			}) //FUNC srop
 
 			.success( function ($data) {
@@ -158,7 +161,7 @@ var rmApplication	= function ($options) {
 				// Redirecting to specified URL if one specified
 				if ( $data.redirect )
 					window.location.href = $data.redirect;
-				
+
 			}) //FUNC success
 
 			.error( function ($data) {

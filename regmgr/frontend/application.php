@@ -62,6 +62,16 @@ class mwApplication extends mwController {
 
 		$tData = ['application' => $app];
 
+	// ---- Payment ----
+	
+		// Loading payment config and checking amount
+		// Input always present, but is ignored in some cases
+		$pCfg	= rmCfg()->getTypes($type, 'payment');
+		$amount	= 0;
+		
+		if ( !empty($pCfg['enabled']) and !empty($pCfg['amount']) )
+			$amount	= $pCfg['amount']; 
+
 	// ---- Template ----
 
 		// Compiling template name from config
@@ -102,6 +112,7 @@ class mwApplication extends mwController {
 			<input type="hidden" name="page" value="<?=$this->wgt->Page->ID?>" />
 			<input type="hidden" name="widget" value="<?=$this->wgt->ID?>" />
 			<input type="hidden" name="form" value="<?=$sn?>" />
+			<input type="hidden" name="amount" value="<?=$amount?>" />
 			<input type="hidden" name="files" value="" />
 			<input type="hidden" name="submit" value="0" />
 			<?=$html?>
@@ -179,6 +190,33 @@ class mwApplication extends mwController {
 		// Setting up current user
 		$app->userId	= User::ID();
 
+	// ---- Payment ----
+	
+		// Validating amount input, just resetting in case of shit
+		if ( empty($_POST['amount']) or !isNumeric($_POST['amount']) )
+			$_POST['amount'] = 0;
+	
+		// Loading payment config and checking amount
+		$pCfg	= rmCfg()->getTypes($_POST['type'], 'payment');
+
+		// Making sure amount is present in condig
+		if ( empty($pCfg['amount']) )
+			 $pCfg['amount'] = 0;
+	
+		// Checking payment settings
+		// If no payment - forcefully zeroing amount 
+		if ( 
+			empty($pCfg) 
+			or empty($pCfg['enabled']) 
+		)
+			$_POST['amount'] = 0;
+
+		// If custom amount is not allowed - forcing value
+		elseif ( empty($pCfg['customAmount']) )
+			$_POST['amount'] = $pCfg['amount'];
+			
+		// If custom amount is enabled - leaving as is
+
 	// ---- DB ----
 
 		// Making sure table is up to date
@@ -211,8 +249,9 @@ class mwApplication extends mwController {
 				
 				// If payment is enabled - keeping app in submit status, 
 				// and adding redirect if immediate payment is set
-				// Otherwise setting to ready state right here 
-				if ( !empty($payCfg['enabled']) ) {
+				// Otherwise setting to ready state right here
+				// Skipping payment if zero amount though 
+				if ( $app->amount and !empty($payCfg['enabled']) ) {
 
 					// ToDo: should calculate amount here
 					
@@ -541,7 +580,8 @@ class mwApplication extends mwController {
 		if ( empty($cfg) or empty($cfg['enabled']) )
 			throw( new Exception('Application type does not support payments') );
 		
-		$amount		= empty($cfg['amount']) ? 0 : $cfg['amount']; 
+	//	$amount		= empty($cfg['amount']) ? 0 : $cfg['amount']; 
+		$amount		= $app->amount; 
 		
 		// Result is optimized for list
 		return [$app, $cfg, $amount];
