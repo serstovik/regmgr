@@ -16,6 +16,8 @@ var rmStepValidator		= function ($el, $options) {
 		formElements		: ['input', 'textarea', 'select'],
 		
 		//error messages
+		// todo: add option to enebale it on Init, right now it's disable
+		addErrorMsg		: false,			// disabled by default, if true then input titles will show	
 		errorMsg		: 'All marked fields are required',
 		notValidPrevStepMsg	: 'You should fill our all previous steps before move here',
 		
@@ -36,11 +38,11 @@ var rmStepValidator		= function ($el, $options) {
 		},
 		
 		css			: {
-			errorBorder		: '1px solid red'	
+			errorBorder		: '1px solid red !important'	
 		},
 		
 		init			: function () {
-
+			
 			var $this		= this;
 			
 			$this.dom.stepWrap	= $el;
@@ -52,23 +54,28 @@ var rmStepValidator		= function ($el, $options) {
 				//if true then we check another 
 				$this.validateElements($this.formElements[i]);
 			}//for
-
+			
 			//if we have non-valid elements return false with error msg
 			if ($this.dom.notValidTagNames.length > 0){
 				
 				//add errorBorders
 				$this.addErrorBorder();
+				/*
 				//show error Message
-				$this.showErrorMessage();
+				if ($this.addErrorMsg)
+					$this.showErrorMessage();
+				*/
 				$this.validateStatus	= false;
 				//add not valid status
 				$this.updateStepValidationStatus($this.dom.stepWrap, false);
 			} 
 			else {
+				
 				$this.validateStatus	= true;
 				//add validate status
 				$this.updateStepValidationStatus($this.dom.stepWrap, true);
-			}
+			}//if
+			
 			
 			return $this.validateStatus;
 					
@@ -78,19 +85,55 @@ var rmStepValidator		= function ($el, $options) {
 
 			var $this	= this;
 			
+			var tabName	= jQuery($this.dom.stepWrap).attr('name');
+			
 			jQuery($this.dom.stepWrap).find($tag).each(function () {
-				//check if element has this attr
-				var attr = jQuery(this).attr('required');
-				
-				if (typeof attr !== typeof undefined && attr !== false) {
-  					//checking if value is empty and is so adding not-valid elemnt to array
-					var elValue	= jQuery(this).val();
-					if(elValue == undefined || elValue == '' ){
-						$this.dom.notValidTagNames.push(jQuery(this).attr('name'));
-						$this.dom.notValidTitles.push(jQuery(this).attr('title'));
-					}//if
-				}//if
+				// checking if element is vidible
+				if (jQuery(this).is(':visible')) {
+					
+					//check if element has this attr
+					var attr 	= jQuery(this).attr('required');
+					var elType	= jQuery(this).attr('type');
+					var elName	= jQuery(this).attr('name');
+					
+					if (typeof attr !== typeof undefined && attr !== false) {
+						//checking if value is empty and is so adding not-valid element to array
+						var elValue = jQuery(this).val();
+
+						if (elValue == undefined || elValue == '' || elValue == 'Please Select') {
+							$this.dom.notValidTagNames.push(jQuery(this).attr('name'));
+							$this.dom.notValidTitles.push(jQuery(this).attr('title'));
+						} else {
+							if ($tag == 'select'){
+								jQuery(this).parent('div.mwInput').css('border-color', '#ccc');
+							}
+							else if(elType == 'file'){
+								jQuery('span.validate_'+elName).css('color', 'black');
+							}
+							else{
+								jQuery(this).parent('div.mwInput').removeClass('error Error');
+							}//if 
+						}
+						
+						if (elType == 'radio' || elType == 'checkbox'){
+							//we need to check it just once not for each element
+							var elName	= jQuery(this).attr('name');
+							var isChecked	= jQuery('input[name='+elName+']').is(':checked');
+
+							//if not checked then add them to the notValidList
+							if(!isChecked){
+								$this.dom.notValidTagNames.push(jQuery(this).attr('name'));
+								$this.dom.notValidTitles.push(jQuery(this).attr('title'));	
+							}//if isChecked
+							else {
+								jQuery(this).css('border', 'none');
+								jQuery('span.validate_'+elName).css('color', 'black');
+							}
+						}//if radio
+					}//if attr
+				}// if isVisible
 			});//each
+			
 			
 		}, //validateElements
 		
@@ -101,7 +144,26 @@ var rmStepValidator		= function ($el, $options) {
 			for(var i = 0; i < $this.dom.notValidTagNames.length; i ++){
 				
 				var elName = $this.dom.notValidTagNames[i];
-				jQuery("input[name='"+elName+"']").closest('.mwInput').addClass('error Error');
+				var curInputEl	= jQuery("input[name='"+elName+"']");
+				var curSelectEl	= jQuery("select[name='"+elName+"']");
+				
+				if (curInputEl.size() > 0){
+					//error classes dont work for input type=file and select boxes
+					if (curInputEl.attr('type') == 'file'){
+						jQuery("span.validate_"+elName).css("color", "red");
+					}
+					else if(curInputEl.attr('type') == 'radio' || curInputEl.attr('type') == 'checkbox') {
+						curInputEl.closest('.mwInput').css('border', 'none');
+						jQuery('span.validate_'+elName).css('color', 'red');
+					}
+					else {
+						curInputEl.closest('.mwInput').addClass('error Error');
+					}	
+				
+				} else if(curSelectEl.size() > 0) {
+					curSelectEl.closest('.mwInput').css('border', '1px solid red');
+					// jQuery("select[name='"+elName+"']").closest('.mwInput').addClass('error Error');
+				}
 				
 			}//for	
 			
@@ -139,7 +201,7 @@ var rmStepValidator		= function ($el, $options) {
 			var $this	= this;
 			
 			jQuery($this.dom.errorMsgWrap).html('');
-			jQuery('.error').removeClass('error');
+			jQuery('.error').removeClass('error Error');
 			
 			$this.dom.notValidTagNames	= [];
 			$this.dom.notValidTitles	= [];
@@ -161,31 +223,38 @@ var rmStepValidator		= function ($el, $options) {
 			
 			//get tab order of current step from 0
 			var stepOrder	= jQuery('div[data-for='+cName+']').index('.'+$this.dom.rmStepClass);
-
 			//if we are on the first step then don't update
 			if (stepOrder == 0)
 				return true;
 			
 			//check if all prev steps are valid
 			var arePreviousStepsValid	= false;
-			
 			for (var i = 0; i < stepOrder; i++){
 				//by default status is false
-				
 				//check if prev steps have been validate
 				if ( jQuery('.'+$this.dom.rmStepClass).eq(i).hasClass($this.validatedStepClass) ){
 					arePreviousStepsValid	= true;
 				}
 				else {
-					
-					// todo: show message with the tab header which are not valid
-					$this.showError($this.notValidPrevStepMsg);
-					arePreviousStepsValid = false;
+					if( jQuery('.'+$this.dom.rmStepClass).eq(i).is(':visible') ){
+						var isSelected;
+
+						//checking if label is selected then return just true
+						isSelected = jQuery('label.rmTabs-button[data-for='+cName+']').hasClass('selected');
+						
+						if (isSelected)
+							return true;
+						
+						// todo: check if it's not a current step that just started
+						$this.showError($this.notValidPrevStepMsg);
+						arePreviousStepsValid = false;
+						
+					}//if isvisible only
 					
 				}//if
-				
-			}//for
 
+			}//for
+			
 			return arePreviousStepsValid;
 			
 		}, //isPrevStepsValid

@@ -9,9 +9,18 @@ var RM_FRONTEND_AJAX = '/ajax/regmgr/application';
  * 	@category	model
  *
  \**//** -----------------------------------------------------------------------= by SerStoVik @ Morad Media Inc. =----/** //**/
+jQuery.fn.rmApplication = function ($options) {
+
+	if ( !this.length )
+		return;
+
+	return this.data('rmApplication').set($options);
+
+} //FUNC rmApplication
+
 var rmApplication	= function ($options) {
 
-	return vEventObject(['onInit', 'onLoad', 'onSave'], {
+	return vEventObject(['onInit', 'onLoad', 'onBeforeSave', 'onSave'], {
 
 	dom		: {			// Set of shortcuts to useful elements
 
@@ -20,14 +29,8 @@ var rmApplication	= function ($options) {
 
 		actions		: false,		// Action inputs
 
-		loader		: false,	// Form loader
+		loader		: false,		// Form loader
 		status		: false,		// Form status
-
-		tabs		: {			// Tabs elements
-			wrap		: false,		// Tabs buttons wrapper
-			buttons		: false,		// Tabs buttons
-			contents	: false,		// Tabs contents
-		}, //tabs
 
 	}, // dom
 
@@ -90,6 +93,9 @@ var rmApplication	= function ($options) {
 
 		$el = _jq($options['el']);
 		
+		// Storing self in container for later reuse
+		$el.data('rmApplication', $this);
+		
 		$this.dom.container	= $el;
 		$this.dom.form		= $this.dom.container.find('form');
 
@@ -129,6 +135,10 @@ var rmApplication	= function ($options) {
 
 		var $this = this;
 
+		// Calling pre-save callbacks, allowing to cancel process if necessary
+		if ( $this.onBeforeSave($this) === false )
+			return;
+
 		// Setting submit flag
 		$this.dom.form.find('[name=submit]').val( $submit ? '1' : '0' );
 
@@ -144,23 +154,30 @@ var rmApplication	= function ($options) {
 			}) //FUNC start
 
 			.stop( function ($data) {
-			//	$this.state($action, false);
-				
-				//simulation for localhost
-				setTimeout(function() {
+
+				// Scrolling to top of container
+				// Giving some space above form (for titles/headers)
+				var $delta = 150;
+				jQuery('html, body').animate({
+					scrollTop: $this.dom.container.offset().top - $delta
+				}, 300); //jQuery.animate.options
 				
 				//disable loader
 				$this.dom.loader.hide();
+
+			//	$this.state($action, false);
 				
-				}, 1000);
-			
 			}) //FUNC srop
 
 			.success( function ($data) {
 				
 				//show thanks message
 				$this.dom.form.html($this.thank_you);
-				
+
+				// Redirecting to specified URL if one specified
+				if ( $data.redirect )
+					window.location.href = $data.redirect;
+
 			}) //FUNC success
 
 			.error( function ($data) {

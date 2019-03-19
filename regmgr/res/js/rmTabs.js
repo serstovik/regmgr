@@ -140,7 +140,7 @@ var rmTabs		= function ($el, $options) {
 
 				// Looking for prev button and clicking it
 				// This will make sure all necessary events will be triggered, including custom ones
-				$this.current.button.prevAll('.rmTabs-button:first')
+				$this.current.button.prevAll('.rmTabs-button:visible:first')
 					.trigger('click');
 
 			}); //FUNC onClick
@@ -149,7 +149,7 @@ var rmTabs		= function ($el, $options) {
 			.on('click.rmTabs', function ($e) {
 
 				// Looking for prev button and clicking it
-				$this.current.button.nextAll('.rmTabs-button:first')
+				$this.current.button.nextAll('.rmTabs-button:visible:first')
 					.trigger('click');
 
 			}); //FUNC onClick

@@ -41,7 +41,7 @@ var rmNotes	=  (function () {
 					var addClicks	= function() {
 
 						$this.dom.submitBtn.off().on('click.btn', function (e) {
-
+							console.log(44,'clicked button');
 							e.preventDefault();
 							//TODO: SEND appId
 							var $appId = jQuery(this).find('input').attr('rel');
@@ -51,14 +51,15 @@ var rmNotes	=  (function () {
 							$params.text = $this.dom.textArea.val();
 							
 							if ($params.text.length == 0){
+								console.log(54);
 								$this.dom.textArea.parent().css('border', '1px solid red');
 								return false;
 							}// if no data were entered
 							
 							mwAjax(RM_BACKEND_NOTES_AJAX + '/addNote/', $params, 'applicationEd')
-
+						
 								.success(function ($data) {
-
+									console.log(62, $data);
 									if($data.content != undefined){
 										
 										// var $newEl	= $this.dom.wrapper.find('dl').last('dl').clone();
@@ -76,12 +77,14 @@ var rmNotes	=  (function () {
 										// newEl += "<button rel='" + $data.content.id + "' class='rmnotes-remove-btn'>Remove</button>";
 										newEl += "<hr></dl>";
 	
-										jQuery(newEl).appendTo($this.dom.wrapper);
+										// jQuery(newEl).appendTo($this.dom.wrapper);
+										jQuery(newEl).prependTo($this.dom.wrapper);
 										
-										$this.dom.textArea.parent().css('border', '1px solid #828282');
+										// $this.dom.textArea.parent().css('border', '1px solid #828282');
 										
 									} else {
-										$this.dom.textArea.parent().css('border', '1px solid red');	
+										console.log(84);
+										// $this.dom.textArea.parent().css('border', '1px solid red');	
 									}
 
 									//clear textbox

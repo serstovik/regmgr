@@ -34,6 +34,8 @@ class rmApplication extends vDBObject {
 	public	$statusMajor		= 'new';			// |- Major and minor application statuses.
 	public	$statusMinor		= '';				// |
 
+	public	$amount			= 0;				// Amount for payment. Should be calculated by extensions on save.
+	public	$transaction		= '';				// Transaction SN. Obtained during payment.
 
 	public	$extensions		= [];				// Selected products list with submitted info.
 
@@ -41,18 +43,21 @@ class rmApplication extends vDBObject {
 
 		$this
 
-			->setField('id')->Validations('isID')
-			->setField('sn')->Validations('trim|isSN(A)')
+			->setField('id')				->Validations('isID')
+			->setField('sn')				->Validations('trim|isSN(A)')
 
-			->setField('type')->Validations('isAlnum')
+			->setField('type')				->Validations('isAlnum')
 
-			->setField('modified')->Validations('')->DB(true, VDBO_DB_READ)->dbType('timestamp', false, true, true)
-			->setField('created')->Validations('')->DB(true, VDBO_DB_READ)->dbType('timestamp', false, 'CURRENT_TIMESTAMP', false)
+			->setField('modified')				->Validations('')->DB(true, VDBO_DB_READ)->dbType('timestamp', false, true, true)
+			->setField('created')				->Validations('')->DB(true, VDBO_DB_READ)->dbType('timestamp', false, 'CURRENT_TIMESTAMP', false)
 
-			->setField('userId', 'user_id')->Validations('isID')
+			->setField('userId', 'user_id')			->Validations('isID')
 
-			->setField('statusMajor', 'status_major')->Validations('isAlnum')
-			->setField('statusMinor', 'status_minor')->Validations('isAlnum')
+			->setField('statusMajor', 'status_major')	->Validations('isAlnum')
+			->setField('statusMinor', 'status_minor')	->Validations('isAlnum')
+
+			->setField('amount')				->Validations('isNumeric', 'Amount')->dbType('decimal', '11,2', '0')
+			->setField('transaction')
 
 			->setField('extensions')->Validations('')->SZ()->dbType('text', false)
 
@@ -112,7 +117,6 @@ class rmApplication extends vDBObject {
 	
 	function getList ($options = []) {
 	
-	//__($options);
 	// ---- Filter ----
 		
 		$where = '';
@@ -191,6 +195,58 @@ class rmApplication extends vDBObject {
 		return $res;
 
 	} //FUNC getList
+
+	function setStatus ($major = false, $minor = false, $options = []) {
+		
+	// ---- Options ----
+	
+		$options = array_merge( [
+			'save'		=> true,		// Set FALSE to skip auto update in DB
+			'trigger'	=> true,		// Set FALSE to do not trigger event
+		], $options );
+	
+	// ---- Values ----
+
+		// Checking states against current values
+		// Doing in loop for code simplification
+		// Collecting updated data for single call update
+		$data = [];
+		foreach ( ['status_major' => $major, 'status_minor' => $minor] as $cName => $status ) {
+			
+			// Nothing to do if status is not set
+			if ( !$status )
+				continue;
+	
+			// Gettining field name from alias
+			$name	= $this->getField($cName)->Field;
+			
+			// For new applications - just setting and triggering
+			// For existing applications - updating only if status changed
+			if ( 
+				!$this->id
+				or ($this->id and $this->$name != $status)
+			) {
+
+				// Setting status in self, storing as data for update and triggering event				
+				$this->$name	= $status;
+				$data[$cName]	= $status;
+				
+				// Triggering if allowed
+				(new mwEvent('regmgr.status.'.$status))
+					->trigger($this);
+				
+			} //IF status updated
+			
+		} //FOR each scope
+
+		// If there is somethinig to update - saving in DB
+		// Updating manually to speedup and not mess up with other stuff
+		if ( $data and $this->id and $options['save'] )
+			mwDB()->update($this->Table, $data, ['id' => $this->id], 1);
+		
+		return $this;
+		
+	} //FUNC setStatus
 	
 	function getDescValues($field) {
 		

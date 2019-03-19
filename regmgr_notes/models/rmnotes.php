@@ -15,24 +15,24 @@
 
 // ---- FIELDS ----
 
-	public	$id			= 0;				// DB id.
-	public	$appID			= 0;				// Application ID.
-	public	$created		= '';				// |- Creation and last modification dates.
-	public	$modified		= '';				// |
-	public	$userID			= 0;				// |- User ID.
-	public	$text			= '';				// |
+	public	$ID			= 0;				// DB id.
+	public	$AppID			= 0;				// Application ID.
+	public	$Created		= '';				// |- Creation and last modification dates.
+	public	$Modified		= '';				// |
+	public	$UserID			= 0;				// |- User ID.
+	public	$Text			= '';				// |
 
 
  	function __construct () {
 
 		$this
 
-			->setField('id')->Validations('isID')
-			->setField('appID', 'app_id')->Validations('isID')
-			->setField('created')->Validations('')->DB(true, VDBO_DB_READ)->dbType('timestamp', false, 'CURRENT_TIMESTAMP', false)
-			->setField('modified')->Validations('')->DB(true, VDBO_DB_READ)->dbType('timestamp', false, true, true)
-			->setField('userID', 'user_id')->Validations('isID')
-			->setField('text')->Validations('trim|cleanXSS')
+			->setField('ID')->Validations('isID')
+			->setField('AppID', 'app_id')->Validations('isID')
+			->setField('Created')->Validations('')->DB(true, VDBO_DB_READ)->dbType('timestamp', false, 'CURRENT_TIMESTAMP', false)
+			->setField('Modified')->Validations('')->DB(true, VDBO_DB_READ)->dbType('timestamp', false, true, true)
+			->setField('UserID', 'user_id')->Validations('isID')
+			->setField('Text')->Length('inf')->Validations('cleanXSS')
 
 		; //OBJECT $this
 
@@ -45,7 +45,7 @@
 
 	function getNotesByAppId($appId){
  		
- 		$sql	= "SELECT * FROM {$this->Table} WHERE `app_id` = {$appId}";
+ 		$sql	= "SELECT * FROM {$this->Table} WHERE `app_id` = {$appId} ORDER BY `created` DESC";
  		$notes	= mwDB()->query($sql)->asArray();
  		//adding users to the notes
  		return $this->addUsersToNotes($notes);
