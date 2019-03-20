@@ -189,6 +189,10 @@ class mwApplication extends mwController {
 	
 		// Setting up current user
 		$app->userId	= User::ID();
+		
+		// Validating, as currently applications can't be without users
+		if ( !$app->userId )
+			throw( new Exception('Please login or register first.') );
 
 	// ---- Payment ----
 	
@@ -237,7 +241,7 @@ class mwApplication extends mwController {
 		if ( !empty($_POST['submit']) && $_POST['submit'] == '1' ) {
 			
 			// Submit is set only for new or opened applications
-			if ( empty($this->statusMajor) or in_array($this->statusMajor, [RM_STATUS_NEW, RM_STATUS_OPEN]) ) {
+			if ( empty($app->statusMajor) or in_array($app->statusMajor, [RM_STATUS_NEW, RM_STATUS_OPEN]) ) {
 
 				// Setting submit status and triggering it
 				$app->setStatus(RM_STATUS_SUBMIT);
@@ -272,6 +276,14 @@ class mwApplication extends mwController {
 				} //IF no payment enabled
 
 			} //change status to submit
+			
+			// Just in case - leaving application open
+			else {
+
+				// Just setting open state 			
+				$app->setStatus(RM_STATUS_OPEN);
+				
+			} //IF submitted from weird state
 
 		} //IF submit button clicked
 		

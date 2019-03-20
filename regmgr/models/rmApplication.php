@@ -31,7 +31,7 @@ class rmApplication extends vDBObject {
 
 	public	$userId			= '';				// Application owner.
 
-	public	$statusMajor		= 'new';			// |- Major and minor application statuses.
+	public	$statusMajor		= RM_STATUS_NEW;		// |- Major and minor application statuses.
 	public	$statusMinor		= '';				// |
 
 	public	$amount			= 0;				// Amount for payment. Should be calculated by extensions on save.

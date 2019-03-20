@@ -49,18 +49,25 @@ class mwIndex extends mwController {
 		";
 	
 		$row	= mwDB()->query($sql)->asRow();
-		
-		// Nothing to do if no applications for user.
-		// ToDo: redirect or message instead.
-		if ( empty($row['id']) )
+
+		// If no application found - redirecting to new application
+		if ( empty($row['id']) ) {
+			
+			// Since don't know which application should be used - using first application from config for yet
+			// In most cases there is only one type anyway
+			// Normal UI should be implemented instead of this anyway
+			$types	= rmCfg()->getTypes();
+			reset($types);
+			$type	= key($types); 
+
+			redirect($this->wgt->Page->url.'/application/'.$type);
+			
 			return;
+			
+		} //IF no applications
 
 		// Have enough to compose url and redirect onto it
-//		__($this->wgt->Page->url);
-//		__($row);
-
 		redirect($this->wgt->Page->url.'/application/'.$row['type'].'/'.$row['id']);
-			
 	
 	} //FUNC index
 
