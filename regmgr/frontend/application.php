@@ -102,6 +102,30 @@ class mwApplication extends mwController {
 			
 		} //IF existing application
 	
+		//showing files if they were already uploaded 
+		//arrays for the files
+		$thumbs_list 	= [];
+		
+		//loop user fields
+		foreach($app->_fields as $k => $v) {
+			
+			//check is field has input - no input means its a base field (cant be file input)
+			if ( empty( $v['input'] ) ) continue;
+			
+			//check is input type=file
+			if ( $v['input']['type'] != 'File' ) continue;
+			
+			$fileName	= $v['input']['name'];
+			//check is listing has some value for this input
+			if ( !empty($app->$fileName) )
+				$thumbs_list[] = array(
+					'name' => $v['input']['name'], 
+					'value' => $app->$fileName, 
+					'title' => $v['input']['title']
+				);
+			
+		}//foreach
+		
 	// ---- Render ----
 
 		$sn = newSN('F');

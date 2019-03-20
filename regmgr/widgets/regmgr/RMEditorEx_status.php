@@ -31,11 +31,11 @@ class mwRMEditorEx_status extends mwRMEditorEx
 					<!--input id="regmgr_approval_value" type="hidden" name="approval_value" /-->
 				</td></tr>
 				
-				<?php if( sizeof($statuses) > 1 ):?>
+				<?php if( sizeof($statusesMinor) > 1 ):?>
 				<tr><th>Custom Statuses:</th></tr>
 				<tr><td>
 					<select name="status_minor" id="regmgr_minor_status" onChange="jQuery('[name=status_minor]').val(jQuery(this).val());">
-					<?foreach($statuses as $k => $v):?>
+					<?foreach($statusesMinor as $k => $v):?>
 						<option value="<?=$k?>"><?=$v?></option>
 					<?endforeach;?>
 					</select>
