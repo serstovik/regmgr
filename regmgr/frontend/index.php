@@ -60,14 +60,18 @@ class mwIndex extends mwController {
 			reset($types);
 			$type	= key($types); 
 
-			redirect($this->wgt->Page->url.'/application/'.$type);
+			$url = fullURL( compileURL($this->wgt->Page->url, 'application', $type) );
+
+			redirect($url);
 			
 			return;
 			
 		} //IF no applications
 
+		$url = fullURL( compileURL($this->wgt->Page->url, 'application', $row['type'], $row['id']) );
+
 		// Have enough to compose url and redirect onto it
-		redirect($this->wgt->Page->url.'/application/'.$row['type'].'/'.$row['id']);
+		redirect($url);
 	
 	} //FUNC index
 
