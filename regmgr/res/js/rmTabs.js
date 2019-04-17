@@ -31,7 +31,16 @@ var rmTabs		= function ($el, $options) {
 		buttons			: false,			// Tab captions buttons
 		contents		: false,			// Tab bodies
 
-	}, //$dom
+	}, //dom
+
+	classes			: {				// Set of classes used to define structure
+	
+		container		: 'rmTabs-container',
+		control			: 'rmTabs-control',
+		button			: 'rmTabs-button',
+		content			: 'rmTabs-content',
+		
+	}, //classes
 
 	current			: {				// Information about current tab
 
@@ -116,12 +125,12 @@ var rmTabs		= function ($el, $options) {
 		$el.data('rmTabs', $this);
 
 		$this.dom.wrap		= $el;
-		$this.dom.container	= $el.find('.rmTabs-container');
-		$this.dom.head		= false;				// There is no tabs head in this logic
+		$this.dom.container	= $el.find('.'+$this.classes.container);
+		$this.dom.head		= false;				// There is no separate tabs head in current logic
 		
-		$this.dom.controls	= $el.find('.rmTabs-control');
-		$this.dom.buttons	= $el.find('.rmTabs-button');
-		$this.dom.contents	= $el.find('.rmTabs-content');
+		$this.dom.controls	= $el.find('.'+$this.classes.control);
+		$this.dom.buttons	= $el.find('.'+$this.classes.button);
+		$this.dom.contents	= $el.find('.'+$this.classes.content);
 
 	// ---- Events ----
 
@@ -185,24 +194,17 @@ var rmTabs		= function ($el, $options) {
 	*
 	*	Initializes current tab.
 	*
-	*	@param	jQuery	$control	- Control element for tab.
+	*	@param	object	$tab	- Tab data.
 	*
 	*	@return SELF
 	*
 	\**//** -------------------------------------------------------------------= by Mr.V!T @ Morad Media Inc. =----/** //**/
-	setCurrent	: function ($control) {
+	setCurrent	: function ($tab) {
 		
 		var $this = this;
 		
-		// Saving control, and getting name from it's id
-		$this.current.control	= $control;
-		$this.current.name	= $control.attr('id');
-
-		// Button is adjacent to label
-		$this.current.button	= $control.next();
-		
-		// Content follows next
-		$this.current.content	= $this.current.button.next(); 
+		// Currently just saving tab as current
+		$this.current	= $tab; 
 	
 		return this;
 		
@@ -219,23 +221,27 @@ var rmTabs		= function ($el, $options) {
 		
 		var $this = this;
 
+		// Preparing old and new tabs as vars
+		var $current	= $this.current;
+		var $target	= $this.getTab($el);
+
 		// Not doing anything if same button clicked
-		if ( $this.current.button && $el.is($this.current.button) )
+		if ( $current.button && $el.is($current.button) )
 			return;
 
 		// Triggering leave event first, passing current tab stuff
 		// Skipping when there is no current though
-		if ( $this.current.control )
-			if ( $this.onTabLeave($this.current) === false )
+		if ( $current.control )
+			if ( $this.onTabLeave($current, $target) === false )
 				return false;
 
 		// Removing selcted class form old current
-		if ( $this.current.button )
-			$this.current.button.removeClass('selected');
+		if ( $current.button )
+			$current.button.removeClass('selected');
 
 		// Setting clicked tab as current
 		// Control will be imideately preceeding button
-		$this.setCurrent( $el.prev() );
+		$this.setCurrent( $target );
 		
 		// Running enter callback, it's allowed to cancel process
 		if ( $this.onTabEnter($this.current) === false )
@@ -254,6 +260,35 @@ var rmTabs		= function ($el, $options) {
 	}, //FUNC switchTab
 
 /* ==== HELPERS ============================================================================================================= */
+
+	/** //** ----= getTab	=--------------------------------------------------------------------------------------\**//** \
+	*
+	*	Collects tab information into common format object. See object head for definition.
+	*
+	*	@param	jQuery	$el	- Tab element (any that belongs to tab se)
+	*
+	*	@return object		- Object that describes tab.
+	*
+	\**//** -------------------------------------------------------------------= by Mr.V!T @ Morad Media Inc. =----/** //**/
+	getTab	: function ($el) {
+
+		var $this	= this;
+
+		// Looking for control. If it's not given already - it's somewhere before
+		var $control	= ( $el.is('.'+$this.classes.control) ) ? $el : $el.prevAll('.'+$this.classes.control).first();  
+
+		// Composing tab details object
+		var $tab	= {
+			name		: $control.attr('id'),		// Name is written on control
+			control		: $control,			// Control is starting point
+			button		: $control.next(),		// Button goes right next to control
+			content		: $control.next().next(),	// Then goes content
+			
+		}; //tab
+
+		return $tab;
+
+	}, //FUNC getTab
 
 	/** //** ----= updateHeights	=------------------------------------------------------------------------------\**//** \
 	*
