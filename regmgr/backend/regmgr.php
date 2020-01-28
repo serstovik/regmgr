@@ -8,6 +8,7 @@ class mwRegmgr extends mwController
 {
 
 	public 	$AutoIndex	= true;
+	public	$app		= null;
 
 	function __init() {
 
@@ -40,14 +41,12 @@ class mwRegmgr extends mwController
 		//set list_options type
 		if ( !$this->isAjax )
 			$_SESSION['regmgr']['list_options']['type'] = $type;
-		//__($_SESSION['regmgr'], $type);
 		
 		//set list_options sorting
 		if ( empty($_POST['sorting']) ) {
 			
 			//load sorting cfg data
 			$sortingCFG = rmCfg()->getSorting();
-			//__($sortingCFG);
 			
 			if ( !empty($sortingCFG['default']['value']) )
 				$_SESSION['regmgr']['list_options']['sorting'] = $sortingCFG['default']['value'];
@@ -61,23 +60,18 @@ class mwRegmgr extends mwController
 		$rows = $this->app->getList($_SESSION['regmgr']['list_options']);
 		
 		//set list_options filter
-		if ( !empty( $_POST['filterKey'] ) ) {
-		
+		if ( !empty( $_POST['filterKey'] ) )
 			$_SESSION['regmgr']['list_options']['filter'] = ['key' => $_POST['filterKey'], 'value' => $_POST['filterValue']];
-			
-		}
 		
 		//reset filter on page load
 		if ( !$this->isAjax )
-		$_SESSION['regmgr']['list_options']['filter'] = false;
+			$_SESSION['regmgr']['list_options']['filter'] = false;
 		
 		//get filters list
 		$filterCFG = rmCfg()->getBranch('core', 'filter');
-		//__($filterCFG);
 		
 		//get column widgets list
 		$columnList = $this->_getColumnWidgets($filterCFG);
-		//__($columnList);
 		
 		//no need to filter data if no filter empty
 		if ( !empty($_SESSION['regmgr']['list_options']['filter']) ) {
@@ -90,13 +84,10 @@ class mwRegmgr extends mwController
 					[$columnList[$k]['widget'], 'filter_' . $columnList[$k]['method_base']],
 					$rows, $filterCFG[$k], $_SESSION['regmgr']['list_options']['filter']
 				);
-				
-			}
-			
-		}
+			} //FOR each column
+		} //IF filter is set
 		
 		$tData = [];
-		
 		$this->_renderIndex($rows, $tData);
 		
 		if ( $this->isAjax )
@@ -269,7 +260,6 @@ class mwRegmgr extends mwController
 		
 		//get sorting config data
 		$sortingCFG = rmCfg()->getSorting();
-		//__($sortingCFG);
 		
 		//generate sorting select
 		$html = '';
@@ -282,11 +272,9 @@ class mwRegmgr extends mwController
 		
 		//get filters data
 		$filterCFG = rmCfg()->getBranch('core', 'filter');
-		//__($filterCFG);
 		
 		//get column widgets list
 		$columnList = $this->_getColumnWidgets($filterCFG);
-		//__($columnList);
 		
 		//loop column list and call widgets to filter data
 		foreach( $columnList as $k => $v ) {

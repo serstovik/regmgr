@@ -9,16 +9,12 @@ class mwRMEditorEx_status extends mwRMEditorEx
 
 	function editor () {
 		
-		//__($this->application->statusList);
-		//__($this->data);
-		
 		//$this->load->model('rmCfg'); // how to load lib?
 		
 		$statusesMajor = rmCfg()->getStatuses('', RM_STATUS_SCOPE_MAJOR);
 		$statusesMinor = rmCfg()->getStatuses('', RM_STATUS_SCOPE_MINOR);
 		
 		$statusesMinor = array_merge([0 => 'Select Status'], $statusesMinor);
-		//__($statuses);
 		
 		?>
 		
@@ -45,7 +41,6 @@ class mwRMEditorEx_status extends mwRMEditorEx
 		</div>
 		<script>
 		jQuery(function(){
-			//___(11111);
 			
 			var update_text = function() {
 				

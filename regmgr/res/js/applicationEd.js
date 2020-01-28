@@ -100,7 +100,7 @@ var applicationEd = (function () {
 	*
 	\**//** -------------------------------------------------------------------= by Mr.V!T @ Morad Media Inc. =----/** //**/
 	apply		: function ($callback) {
-
+			
 		var $this	= this;
 		
 		// Saving current tabs positions

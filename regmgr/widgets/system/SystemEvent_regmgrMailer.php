@@ -26,9 +26,6 @@ class mwSystemEvent_regmgrMailer extends mwSystemEvent {
 	\**//** -------------------------------------------------------------------= by Mr.V!T @ Morad Media Inc. =----/** //**/
 	function trigger ($event, $data) {
 		
-		//__($event, $data);
-		//__($data);
-		
 		//check is this status event
 		if ( !empty($event->descriptor[1]) and $event->descriptor[1] == 'status' and is_object($data) ) {
 			
@@ -37,11 +34,11 @@ class mwSystemEvent_regmgrMailer extends mwSystemEvent {
 			if ( !empty($event->descriptor[2]) ) {
 				
 				$cfg = rmCfg()->getEmails('status.' . $event->descriptor[2]);
-				//__($cfg);
 				
 				foreach( $cfg as $k => $v ) {
 					
 					$user = $this->getUsers($data['user_id']);
+					
 					$adminEmail = mwCfg('System/AdminEmail');
 					
 					$to = str_replace('@user', $user['email'], $v['to']);
@@ -52,7 +49,6 @@ class mwSystemEvent_regmgrMailer extends mwSystemEvent {
 					
 					$subject = arrayToTemplate($data, $v['subject']);
 					
-					//__($user);
 					if ( is_array($user) )
 						$data = array_merge($user, $data);
 
@@ -62,7 +58,6 @@ class mwSystemEvent_regmgrMailer extends mwSystemEvent {
 					
 					$body = (new vTpl2($body))->parse()->vars($data)->html();
 					
-					//__($to, $from, $body, $subject);
 					$this->email($to, $from, $body, $subject);
 					
 				}
@@ -75,7 +70,7 @@ class mwSystemEvent_regmgrMailer extends mwSystemEvent {
 	} //FUNC trigger
 	
 	function email( $to, $from, $body, $subject  ) {
-		//__($to, $from, $body, $subject);
+		
 		loadVITLib('email');
 		$mail = new vMailer();
 		$mail->To = $to;

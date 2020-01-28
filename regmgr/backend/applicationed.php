@@ -31,7 +31,7 @@ class mwApplicationEd extends mwEditor {
 	public	$minPanelWidth		= 300;
 
 	function __init	() {
-
+		
 		$this->load->model('rmCfg');
 		$this->load->model('rmApplication');
 
@@ -50,7 +50,7 @@ class mwApplicationEd extends mwEditor {
 			$this->type = $_REQUEST['type'];
 
 		} //IF type is provided
-
+		
 		parent::__init();
 
 	} //CONSTRUCTOR
@@ -142,10 +142,10 @@ class mwApplicationEd extends mwEditor {
 	* 
 	\**//** -------------------------------------------------------------------= by Mr.V!T @ Morad Media Inc. =----/** //**/
 	function onBeforeSave ($item) {
-
+		
 		// Loading extensions
 		$ext	= $this->loadExtensions();
-
+		
 		// Looping through and saving if post have something
 		foreach ( $ext as $name => $obj ) {
 
@@ -157,8 +157,6 @@ class mwApplicationEd extends mwEditor {
 			$this->Item->extensions[$obj->extName] = $obj->save($this->Item->extensions[$obj->extName]);
 				
 		} //FOR each extension
-		
-		__($this->emailMajor, $this->emailMinor);
 		
 		//trigger major status event
 		if ( $this->emailMajor )

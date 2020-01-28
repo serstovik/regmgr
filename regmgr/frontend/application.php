@@ -130,6 +130,15 @@ class mwApplication extends mwController {
 
 		$sn = newSN('F');
 	?>
+
+		
+
+		<script type="text/javascript">
+
+			rmFilesData	= <?=json_encode($thumbs_list)?>
+
+		</script>
+
 		<form id="<?=$sn?>" action="" method="post" enctype="multipart/form-data" onsubmit="return false;">
 			<input type="hidden" name="id" value="<?=$app->id?>" />
 			<input type="hidden" name="type" value="<?=$type?>" />
