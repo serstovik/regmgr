@@ -37,15 +37,15 @@ var rmApplication	= function ($options) {
 /* ==== SETUP =============================================================================================================== */
 
 	/** //** ----= set	=--------------------------------------------------------------------------------------\**//** \
-	 *
-	 *	Updates self properties with given values.
-	 *
-	 *	@param	MIXED	$option		- Option to set. Can be data object to setup several properties.
-	 *	@param	MIXED	[$value]	- Value to set. Not used if object passes as first parameter.
-	 *
-	 *	@return SELF
-	 *
-	 \**//** ----------------------------------------------------------------------------------= by SerStoVik =----/** //**/
+	*
+	*	Updates self properties with given values.
+	*
+	*	@param	MIXED	$option		- Option to set. Can be data object to setup several properties.
+	*	@param	MIXED	[$value]	- Value to set. Not used if object passes as first parameter.
+	*
+	*	@return SELF
+	*
+	\**//** -----------------------------------------------------------------------------------= by SerStoVik =----/** //**/
 	set		: function ($option, $value) {
 
 		var $this = this;
